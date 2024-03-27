@@ -9,10 +9,9 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(auto()) @map("_id") @db.ObjectId
-  email    String
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  email    String @unique
   password String
-  partite  Partita[]
 }
 
 model Partita {
@@ -24,5 +23,4 @@ model Partita {
   Incasso   Boolean  @default(false)
   voto      Float?
   userId    String   @map("_userId") @db.ObjectId
-  User      User     @relation(fields: [userId], references: [id])
 }
