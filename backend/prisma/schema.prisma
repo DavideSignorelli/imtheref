@@ -1,0 +1,28 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  email    String    @unique
+  password String
+  partite  Partita[]
+}
+
+model Partita {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  nome      String
+  data      DateTime
+  categoria String
+  rimborso  Float
+  Incasso   Boolean  @default(false)
+  voto      Float?
+  userId    String   @map("_userId") @db.ObjectId
+  User      User     @relation(fields: [userId], references: [id])
+}
