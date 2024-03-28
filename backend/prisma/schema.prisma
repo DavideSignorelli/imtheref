@@ -21,7 +21,7 @@ model Partita {
   data      DateTime
   categoria String
   rimborso  Float
-  Incasso   Boolean  @default(false)
+  incasso   Boolean  @default(false)
   voto      Float?
   userId    String   @map("_userId") @db.ObjectId
 }

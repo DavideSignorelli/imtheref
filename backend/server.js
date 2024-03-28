@@ -4,6 +4,7 @@ const app = express();
 const port = 3000;
 //const provaRouter = require('./routes/prova');
 const userRouter = require('./routes/user');
+const partitaRouter = require('./routes/partita');
 
 app.use(express.json());
 const session = require('express-session');
@@ -19,9 +20,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-//app.use('/api/prova', provaRouter);
-app.use('/api/user', userRouter)
-
+app.use('/api/user', userRouter);
+app.use('/api/partita', partitaRouter);
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);

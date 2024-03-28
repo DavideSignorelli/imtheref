@@ -1,5 +1,6 @@
 const express = require('express');
 const CryptoJS = require("crypto-js");
+const bcrypt = require('bcryptjs');
 const userRouter = express.Router();
 const { findByEmail } = require('../utils/user');
 const passport = require('passport');
@@ -16,7 +17,7 @@ userRouter.post('/registrazione', async (req, res) => {
         res.status(400).json({ error: 'Email already in use' });
         return;
     }
-    const hashedPassword = CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
         data: {
             username,
@@ -41,8 +42,8 @@ userRouter.post('/registrazione', async (req, res) => {
 
 userRouter.post('/login', passport.authenticate('local'), async (req, res) => {
     const user = req.user;
-    const attivato = await findByEmail(user.email).attivazione;
-    if (!attivato) {
+    const attivato = await findByEmail(user.email);
+    if (!attivato.attivazione) {
         return res.status(401).json('Account non attivato');
     }
     req.login(user, function (err) {
