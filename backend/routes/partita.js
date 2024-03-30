@@ -29,7 +29,6 @@ partitaRouter.get('/visualizza', isLoggedIn, async (req, res) => {
 
 partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
     const { nome, data, categoria, rimborso, voto } = req.body;
-    console.log('Dati ricevuti:', { nome, data, categoria, rimborso, voto }); // Verifica i dati ricevuti
     const partita = await prisma.partita.update({
         where: {
             id: req.params.id
