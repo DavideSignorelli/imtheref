@@ -45,10 +45,9 @@ partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
 });
 
 
-
-
-
-
+partitaRouter.use((req, res, next) => {
+    res.status(405).json({ error: 'Metodo non autorizzato' });
+});
 
 
 module.exports = partitaRouter;
