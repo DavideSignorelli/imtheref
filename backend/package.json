@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^4.16.0",
+    "@prisma/client": "^4.16.2",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "crypto-js": "^4.2.0",

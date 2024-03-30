@@ -18,6 +18,15 @@ partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
     });
     res.json(partita);
 });
+partitaRouter.get('/visualizza', isLoggedIn, async (req, res) => {
+    const partite = await prisma.partita.findMany({
+        where: {
+            userId: req.session.passport.user
+        }
+    });
+    res.json(partite);
+});
+
 
 
 
