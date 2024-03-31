@@ -18,11 +18,36 @@ partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
     });
     res.json(partita);
 });
+partitaRouter.get('/visualizza', isLoggedIn, async (req, res) => {
+    const partite = await prisma.partita.findMany({
+        where: {
+            userId: req.session.passport.user
+        }
+    });
+    res.json(partite);
+});
+
+partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
+    const { nome, data, categoria, rimborso, voto } = req.body;
+    const partita = await prisma.partita.update({
+        where: {
+            id: req.params.id
+        },
+        data: {
+            nome,
+            data,
+            categoria,
+            rimborso,
+            voto
+        }
+    });
+    res.json(partita);
+});
 
 
-
-
-
+partitaRouter.use((req, res, next) => {
+    res.status(405).json({ error: 'Metodo non autorizzato' });
+});
 
 
 module.exports = partitaRouter;

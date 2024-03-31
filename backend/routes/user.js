@@ -78,4 +78,8 @@ userRouter.get('/attivazione', async (req, res) => {
     }
 });
 
+userRouter.use((req, res, next) => {
+    res.status(405).json({ error: 'Metodo non autorizzato' });
+});
+
 module.exports = userRouter;
