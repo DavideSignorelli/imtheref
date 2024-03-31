@@ -1,4 +1,5 @@
 const express = require('express');
+var cors = require('cors')
 const passport = require('passport');
 const app = express();
 const port = 3000;
@@ -7,6 +8,7 @@ const userRouter = require('./routes/user');
 const partitaRouter = require('./routes/partita');
 
 app.use(express.json());
+app.use(cors());
 const session = require('express-session');
 app.use(
     session({

@@ -37,7 +37,7 @@ passport.deserializeUser(async function (id, done) {
 
 module.exports = function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) return next();
-    res.status(401).json({ "error": 'You must be logged in to do this.' });
+    res.status(401).json({ "error": 'You must be logged in to do this.', "code": 401 });
 }
 
 
