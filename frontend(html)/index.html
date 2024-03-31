@@ -4,27 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Index</title>
     <script>
         async function checklogin() {
+
             const responce = await fetch('http://127.0.0.1:3000/api/user/isloggedin', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                credentials: 'include'
             });
-            alert(responce.status)
-            /*if (responce.status != 200) {
+            alert(responce.status);
+            if (responce.status == 401) {
                 window.location.href = 'login.html';
-            }*/
+            }
         }
     </script>
 </head>
 
 <body onload="checklogin()">
     <h1>BENVENUTO</h1>
-
-
 
 
 </body>

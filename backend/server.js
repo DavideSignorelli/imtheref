@@ -8,7 +8,10 @@ const userRouter = require('./routes/user');
 const partitaRouter = require('./routes/partita');
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://127.0.0.1:5500', // Imposta l'origine consentita per le richieste
+    credentials: true, // Consenti l'invio di credenziali (come i cookie)
+}));
 const session = require('express-session');
 app.use(
     session({

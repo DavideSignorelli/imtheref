@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <script>
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const responce = await fetch('http://127.0.0.1:3000/api/user/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: "dado.signo@gmail.com",
+                    password: "ilduce"
+                }),
+                credentials: 'include'
+            });
+            if (responce.status == 200) {
+                window.location.href = 'index.html';
+            } else {
+                alert('Login failed');
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>LOGIN</h1>
+    <form action="javascript: login()">
+        <label for="email">Email:</label><br>
+        <input type="text" id="email" name="email"><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+
+</html>
