@@ -45,12 +45,7 @@
                 totaleIncassato -= parseFloat(document.getElementById(id).children[4].innerText);
             }
         }
-        setInterval(() => {
-            if (totale != document.getElementById('totale').innerText || totaleIncassato != document.getElementById('totaleIncassato').innerText) {
-                document.getElementById('totale').innerText = totale;
-                document.getElementById('totaleIncassato').innerText = totaleIncassato;
-            }
-        }, 500);
+
     </script>
     <style>
         table,
@@ -92,6 +87,8 @@
                     <td>Voto</td>
                     <td>Rimborso (€)</td>
                     <td>Incasso</td>
+                    <td>Modifica</td>
+                    <td>Elimina</td>
                 </tr>
             </tbody>
         </table>
@@ -154,6 +151,14 @@
                         }
                         tr.appendChild(td6);
 
+                        const td7 = document.createElement('td');
+                        td7.innerHTML = `<button onclick="modifica('${partita.id}')">X</button>`;
+                        tr.appendChild(td7);
+
+                        const td8 = document.createElement('td');
+                        td8.innerHTML = `<button style="background-color: red; font-weight: bold;" onclick="elimina('${partita.id}')">X</button>`;
+                        tr.appendChild(td8);
+
                         tabella.appendChild(tr);
                     });
                     resolve(); // Risolve la promessa quando la tabella è stata popolata
@@ -168,14 +173,22 @@
                 graficoVoti();
                 graficoRimborsi();
                 graficoCategoria();
+                setInterval(() => {
+                    if (totale != document.getElementById('totale').innerText || totaleIncassato != document.getElementById('totaleIncassato').innerText) {
+                        document.getElementById('totale').innerText = totale;
+                        document.getElementById('totaleIncassato').innerText = totaleIncassato;
+                    }
+                }, 500);
             })
             .catch(error => {
                 console.error(error);
             });
-        //const ctx = document.getElementById('myChart');
 
         function graficoVoti() {
             const ctx = document.getElementById('voti');
+            if (ctx.chart) {
+                ctx.chart.destroy(); // Distrugge il grafico esistente se presente
+            }
             let labels = [];
             let data = [];
             tabella = document.getElementById('tabella');
@@ -206,6 +219,9 @@
 
         function graficoRimborsi() {
             const ctx = document.getElementById('rimborsi');
+            if (ctx.chart) {
+                ctx.destroy(); // Distrugge il grafico esistente se presente
+            }
             let labels = [];
             let data = [];
             tabella = document.getElementById('tabella');
@@ -236,6 +252,9 @@
 
         function graficoCategoria() {
             const ctx = document.getElementById('categorie');
+            if (ctx.chart) {
+                ctx.chart.destroy(); // Distrugge il grafico esistente se presente
+            }
             let labels = [];
             let data = [];
             let occorrenze = [];
