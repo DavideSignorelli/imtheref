@@ -4,28 +4,280 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index</title>
+    <title>IMTHEREF</title>
     <script>
+        var totale = 0, totaleIncassato = 0;
         async function checklogin() {
-
-            const responce = await fetch('http://127.0.0.1:3000/api/user/isloggedin', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include'
-            });
-            alert(responce.status);
-            if (responce.status == 401) {
+            let responce;
+            try {
+                responce = await fetch('http://127.0.0.1:3000/api/user/isloggedin', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+            } catch (e) {
+                window.location.href = 'login.html';
+            }
+            if (responce.status != 200) {
                 window.location.href = 'login.html';
             }
         }
+
+        async function checkIncasso(id, value) {
+            const responce = await fetch(`http://127.0.0.1:3000/api/partita/modifica/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    incasso: value
+                })
+            });
+            if (responce.status != 200) {
+                alert('Errore, riprova più tardi');
+            }
+            if (value) {
+                totaleIncassato += parseFloat(document.getElementById(id).children[4].innerText);
+            } else {
+                totaleIncassato -= parseFloat(document.getElementById(id).children[4].innerText);
+            }
+        }
+        setInterval(() => {
+            if (totale != document.getElementById('totale').innerText || totaleIncassato != document.getElementById('totaleIncassato').innerText) {
+                document.getElementById('totale').innerText = totale;
+                document.getElementById('totaleIncassato').innerText = totaleIncassato;
+            }
+        }, 500);
     </script>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            text-align: center;
+        }
+
+        table {
+            width: 80%;
+
+        }
+
+        div {
+            margin: auto;
+            width: 100%;
+        }
+
+        .bold {
+            font-weight: bold;
+            font-size: large;
+        }
+    </style>
 </head>
 
 <body onload="checklogin()">
-    <h1>BENVENUTO</h1>
+    <div style="text-align: center;">
+        <h1>BENVENUTO IN IMTHEREF</h1>
+    </div>
+    <div>
+        <h2>Visualizza le partite</h2>
+        <table id="tabella">
+            <tbody id="bodyTabella">
+                <tr class="bold">
+                    <td>Gara</td>
+                    <td>Data</td>
+                    <td>Categoria</td>
+                    <td>Voto</td>
+                    <td>Rimborso (€)</td>
+                    <td>Incasso</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        <h3>Totale rimborso: <span id="totale">0</span></h3>
+        <h3>Totale incassato: <span id="totaleIncassato">0</span></h3>
+    </div>
+    <div>
+        <canvas id="voti" style="width: 100%;"></canvas>
+        <canvas id="rimborsi" style="width: 100%;"></canvas>
+        <canvas id="categorie" style="width: 100%;"></canvas>
+    </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        function popolaTabella() {
+            return new Promise((resolve, reject) => {
+                const tabella = document.getElementById('tabella').querySelector('tbody');
+                fetch('http://127.0.0.1:3000/api/partita/visualizza', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                }).then(res => res.json()).then(data => {
+                    data.forEach(partita => {
+                        const tr = document.createElement('tr');
+                        tr.id = partita.id;
+
+                        const td1 = document.createElement('td');
+                        td1.innerText = partita.nome;
+                        tr.appendChild(td1);
+
+                        const td2 = document.createElement('td');
+                        let data = partita.data;
+                        data = data.replace('Z', '');
+                        td2.innerHTML = `<input type="datetime-local" name="meeting-time" value="${data}" />`;
+                        tr.appendChild(td2);
+
+                        const td3 = document.createElement('td');
+                        td3.innerText = partita.categoria;
+                        tr.appendChild(td3);
+
+                        const td4 = document.createElement('td');
+                        td4.innerText = partita.voto;
+                        tr.appendChild(td4);
+
+                        const td5 = document.createElement('td');
+                        td5.innerText = partita.rimborso;
+                        totale += partita.rimborso;
+                        tr.appendChild(td5);
+
+                        const td6 = document.createElement('td');
+                        td6.innerHTML = `<input type="checkbox" name="incasso" onchange="checkIncasso('${partita.id}', this.checked)"/>`;
+                        if (partita.incasso) {
+                            td6.firstChild.checked = true;
+                            totaleIncassato += partita.rimborso;
+                        }
+                        tr.appendChild(td6);
+
+                        tabella.appendChild(tr);
+                    });
+                    resolve(); // Risolve la promessa quando la tabella è stata popolata
+                }).catch(error => {
+                    reject(error); // Se c'è un errore nel fetch, la promessa viene rigettata
+                });
+            });
+        }
+
+        popolaTabella()
+            .then(() => {
+                graficoVoti();
+                graficoRimborsi();
+                graficoCategoria();
+            })
+            .catch(error => {
+                console.error(error);
+            });
+        //const ctx = document.getElementById('myChart');
+
+        function graficoVoti() {
+            const ctx = document.getElementById('voti');
+            let labels = [];
+            let data = [];
+            tabella = document.getElementById('tabella');
+            for (let i = 1; i < tabella.rows.length; i++) {
+                labels.push(tabella.rows[i].children[0].innerText);
+                data.push(tabella.rows[i].children[3].innerText);
+
+            }
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '# VOTI',
+                        data: data,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function graficoRimborsi() {
+            const ctx = document.getElementById('rimborsi');
+            let labels = [];
+            let data = [];
+            tabella = document.getElementById('tabella');
+            for (let i = 1; i < tabella.rows.length; i++) {
+                labels.push(tabella.rows[i].children[0].innerText);
+                data.push(tabella.rows[i].children[4].innerText);
+
+            }
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '# RIMBORSI',
+                        data: data,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function graficoCategoria() {
+            const ctx = document.getElementById('categorie');
+            let labels = [];
+            let data = [];
+            let occorrenze = [];
+            tabella = document.getElementById('tabella');
+            for (let i = 1; i < tabella.rows.length; i++) {
+                occorrenze.push(tabella.rows[i].children[2].innerText);
+            }
+            occorrenze = occorrenze.reduce((acc, curr) => {
+                if (acc[curr]) {
+                    acc[curr]++;
+                } else {
+                    acc[curr] = 1;
+                }
+                return acc;
+            }, {});
+            for (let chiave in occorrenze) {
+                labels.push(chiave);
+                data.push(occorrenze[chiave]);
+            }
+
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '# N. PARTITE NELLA CATEGORIA',
+                        data: data,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+    </script>
 
 </body>
 
