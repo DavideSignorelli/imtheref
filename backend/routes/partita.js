@@ -28,7 +28,7 @@ partitaRouter.get('/visualizza', isLoggedIn, async (req, res) => {
 });
 
 partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
-    const { nome, data, categoria, rimborso, voto } = req.body;
+    const { nome, data, categoria, rimborso, voto, incasso } = req.body;
     const partita = await prisma.partita.update({
         where: {
             id: req.params.id
@@ -38,7 +38,8 @@ partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
             data,
             categoria,
             rimborso,
-            voto
+            voto,
+            incasso
         }
     });
     res.json(partita);
