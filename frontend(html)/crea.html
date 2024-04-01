@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea partita</title>
+    <script>
+        async function checklogin() {
+            let responce;
+            try {
+                responce = await fetch('http://127.0.0.1:3000/api/user/isloggedin', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+            } catch (e) {
+                window.location.href = 'login.html';
+            }
+            if (responce.status != 200) {
+                window.location.href = 'login.html';
+            }
+        }
+        checklogin();
+        async function crea() {
+            const nome = document.getElementById("nome").value;
+            const data = document.getElementById("data").value;
+            const categoria = document.getElementById("categoria").value;
+            const rimborso = parseFloat(document.getElementById("rimborso").value);
+            const incasso = document.getElementById("incasso").checked;
+            const voto = parseFloat(document.getElementById("voto").value);
+            const response = await fetch('http://127.0.0.1:3000/api/partita/crea', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome: nome,
+                    data: data,
+                    categoria: categoria,
+                    rimborso: rimborso,
+                    incasso: incasso,
+                    voto: voto
+                }),
+                credentials: 'include'
+            });
+            if (response.ok) {
+                alert("Partita creata con successo");
+                window.location.href = 'index.html';
+            } else {
+                alert("Errore nella creazione della partita");
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <form action="javascript: crea()">
+        <label for="nome">Gara:</label><br>
+        <input type="text" id="nome" name="nome"><br>
+        <label for="data">Data:</label><br>
+        <input type="datetime-local" id="data" name="data"><br>
+        <label for="categoria">Categoria:</label><br>
+        <input type="text" id="categoria" name="categoria"><br>
+        <label for="rimborso">Rimborso:</label><br>
+        <input type="text" id="rimborso" name="rimborso"><br>
+        <label for="incasso">Incasso:</label><br>
+        <input type="checkbox" id="incasso" name="incasso"><br>
+        <label for="voto">Voto:</label><br>
+        <input type="number" id="voto" name="voto"><br><br>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+
+</html>

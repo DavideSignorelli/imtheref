@@ -84,6 +84,10 @@
             });*/
         }
 
+        function crea() {
+            window.location.href = 'crea.html';
+        }
+
     </script>
     <style>
         table,
@@ -135,6 +139,7 @@
         <h3>Totale rimborso: <span id="totale">0</span></h3>
         <h3>Totale incassato: <span id="totaleIncassato">0</span></h3>
     </div>
+    <div><input type="button" value="Inserisci partita" onclick="crea()"></div>
     <div>
         <canvas id="voti" style="width: 100%;"></canvas>
         <canvas id="rimborsi" style="width: 100%;"></canvas>
