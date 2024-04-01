@@ -22,7 +22,17 @@ partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
 partitaRouter.get('/visualizza', isLoggedIn, async (req, res) => {
     const partite = await prisma.partita.findMany({
         where: {
-            userId: req.session.passport.user
+            userId: req.session.passport.user,
+        }
+    });
+    res.json(partite);
+});
+
+partitaRouter.get('/visualizza/:id', isLoggedIn, async (req, res) => {
+    const partite = await prisma.partita.findMany({
+        where: {
+            userId: req.session.passport.user,
+            id: req.params.id
         }
     });
     res.json(partite);
@@ -30,13 +40,20 @@ partitaRouter.get('/visualizza', isLoggedIn, async (req, res) => {
 
 partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
     const { nome, data, categoria, rimborso, voto, incasso } = req.body;
+    let parsedDate;
+    if (data != undefined) {
+        parsedDate = new Date(data); // Converte la stringa data in un oggetto Date
+        if (parsedDate.toString() === 'Invalid Date') {
+            return res.status(400).json({ error: 'Data non valida' });
+        }
+    }
     const partita = await prisma.partita.update({
         where: {
             id: req.params.id
         },
         data: {
             nome,
-            data,
+            data: parsedDate,
             categoria,
             rimborso,
             voto,
@@ -53,6 +70,7 @@ partitaRouter.delete('/elimina/:id', isLoggedIn, async (req, res) => {
         }
     });
     res.json(partita);
+    res.status(405).json({ error: 'Metodo non autorizzato' });
 });
 
 
