@@ -6,7 +6,7 @@ const { partita } = require('../utils/db');
 const prisma = new PrismaClient();
 
 partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
-    const { nome, data, categoria, rimborso, voto } = req.body;
+    const { nome, data, categoria, rimborso, voto, incasso } = req.body;
     const parsedDate = new Date(data); // Converte la stringa data in un oggetto Date
     if (parsedDate.toString() === 'Invalid Date') {
         return res.status(400).json({ error: 'Data non valida' });
@@ -18,6 +18,7 @@ partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
             categoria,
             rimborso,
             voto,
+            incasso,
             userId: req.session.passport.user
         }
     });
