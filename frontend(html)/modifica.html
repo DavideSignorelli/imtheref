@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifica</title>
+    <script>
+        async function checklogin() {
+            let responce;
+            try {
+                responce = await fetch('http://127.0.0.1:3000/api/user/isloggedin', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                });
+            } catch (e) {
+                window.location.href = 'login.html';
+            }
+            if (responce.status != 200) {
+                window.location.href = 'login.html';
+            }
+        }
+        checklogin();
+
+
+        async function ottieniPartita() {
+            const id = localStorage.getItem("idModifica");
+            const response = await fetch('http://127.0.0.1:3000/api/partita/visualizza/' + id, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const partita = await response.json();
+                document.getElementById("nome").value = partita[0].nome;
+                document.getElementById("data").value = partita[0].data.replace('Z', '');
+                document.getElementById("categoria").value = partita[0].categoria;
+                document.getElementById("rimborso").value = partita[0].rimborso;
+                document.getElementById("incasso").checked = partita[0].incasso;
+                document.getElementById("voto").value = partita[0].voto;
+            } else {
+                alert("Errore nel recupero della partita");
+            }
+        }
+        ottieniPartita();
+
+
+
+        async function modifica() {
+            const id = localStorage.getItem("idModifica");
+            const nome = document.getElementById("nome").value;
+            const data = document.getElementById("data").value;
+            const categoria = document.getElementById("categoria").value;
+            const rimborso = parseFloat(document.getElementById("rimborso").value);
+            const incasso = document.getElementById("incasso").checked;
+            const voto = parseFloat(document.getElementById("voto").value);
+            console.log(nome, data, categoria, rimborso, incasso, voto);
+            const responce = await fetch(`http://127.0.0.1:3000/api/partita/modifica/` + id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    nome,
+                    data,
+                    categoria,
+                    rimborso,
+                    incasso,
+                    voto
+                })
+            });
+            if (responce.status != 200) {
+                alert('Errore, riprova più tardi');
+            }
+
+            if (responce.ok) {
+                window.location.href = "index.html";
+            } else {
+                alert("Errore nella modifica");
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Modifica</h1>
+    <form action="javascript: modifica()" method="post">
+        <label for="nome">Nome</label>
+        <input type="text" name="nome" id="nome">
+        <br>
+        <label for="data">Data</label>
+        <input type="datetime-local" name="data" id="data">
+        <br>
+        <label for="categoria">Categoria</label>
+        <input type="text" name="categoria" id="categoria">
+        <br>
+        <label for="rimborso">Rimborso</label>
+        <input type="text" name="rimborso" id="rimborso">
+        <br>
+        <label for="incasso">Incasso</label>
+        <input type="checkbox" name="incasso" id="incasso">
+        <br>
+        <label for="voto">Voto</label>
+        <input type="text" name="voto" id="voto">
+        <br>
+        <input type="submit" value="Modifica">
+    </form>
+
+
+</body>
+
+</html>
