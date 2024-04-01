@@ -2,6 +2,7 @@ const express = require('express');
 const partitaRouter = express.Router();
 const isLoggedIn = require('../utils/passport');
 const { PrismaClient } = require('@prisma/client');
+const { partita } = require('../utils/db');
 const prisma = new PrismaClient();
 
 partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
@@ -40,6 +41,15 @@ partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
             rimborso,
             voto,
             incasso
+        }
+    });
+    res.json(partita);
+});
+
+partitaRouter.delete('/elimina/:id', isLoggedIn, async (req, res) => {
+    const partita = await prisma.partita.delete({
+        where: {
+            id: req.params.id
         }
     });
     res.json(partita);
