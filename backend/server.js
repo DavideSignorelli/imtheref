@@ -29,5 +29,5 @@ app.use('/api/user', userRouter);
 app.use('/api/partita', partitaRouter);
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+    console.log(`backend listening on port ${port}`);
 });

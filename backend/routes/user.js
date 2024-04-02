@@ -12,74 +12,111 @@ var nodemailer = require('nodemailer');
 const prisma = new PrismaClient();
 
 userRouter.post('/registrazione', async (req, res) => {
-    const { username, password, email } = req.body;
-    if (await findByEmail(email)) {
-        res.status(400).json({ error: 'Email already in use' });
-        return;
-    }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
-        data: {
-            username,
-            password: hashedPassword,
-            email
+    try {
+        const { password, email } = req.body;
+        if (!password || !email) {
+            res.status(400).json({ error: 'Email e password sono obbligatorie' });
+            return;
         }
-    });
-    const formdata = new FormData();
-    formdata.append("email", email);
-    formdata.append("hash", "codice");
+        if (await findByEmail(email)) {
+            res.status(400).json({ error: 'Email already in use' });
+            return;
+        }
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await prisma.user.create({
+            data: {
+                password: hashedPassword,
+                email
+            }
+        });
+        const formdata = new FormData();
+        formdata.append("email", email); ///////////////////////////////////////////////inviare un codice decente PLS
 
-    const requestOptions = {
-        method: "POST",
-        body: formdata,
-        redirect: "follow"
-    };
+        const requestOptions = {
+            method: "POST",
+            body: formdata,
+            redirect: "follow"
+        };
 
-    fetch("https://signorellidavide5ib.altervista.org/inviamail.php", requestOptions)
-        .catch((error) => console.error(error));
-    res.json(user);
+        fetch("https://signorellidavide5ib.altervista.org/inviamail.php", requestOptions)
+            .catch((error) => console.error(error));
+        res.json(user);
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Errore interno' });
+    }
+
 });
 
 userRouter.post('/login', passport.authenticate('local'), async (req, res) => {
-    const user = req.user;
-    const attivato = await findByEmail(user.email);
-    if (!attivato.attivazione) {
-        return res.status(401).json('Account non attivato');
+    try {
+        const user = req.user;
+        const attivato = await findByEmail(user.email);
+        if (!attivato.attivazione) {
+            return res.status(401).json('Account non attivato');
+        }
+        req.login(user, function (err) {
+            if (err) { return res.status(401) }
+            return res.status(200).json(user)
+        });
     }
-    req.login(user, function (err) {
-        if (err) { return res.status(401) }
-        return res.status(200).json(user)
-    });
+    catch (error) {
+        res.status(500).json('Errore interno');
+    }
 });
 
 userRouter.get('/logout', function (req, res, next) {
-    req.logout(function (err) {
-        if (err) { return next(err); }
-        res.status(200).json('Ok ti sei sloggato');
-    });
+    try {
+        req.logout(function (err) {
+            if (err) { return next(err); }
+            res.status(200).json('Ok ti sei sloggato');
+        });
+    }
+    catch (error) {
+        res.status(500).json('Errore interno');
+    }
 });
 
 userRouter.get('/isloggedin', isLoggedIn, function (req, res) {
-    res.status(200).json('Ok sei sloggato');
+    try {
+        res.status(200).json('Ok sei sloggato');
+    }
+    catch (error) {
+        res.status(500).json('Errore interno');
+    }
+
 });
 
 userRouter.get('/attivazione', async (req, res) => {
-    const email = req.query.email;
-    const token = req.query.token;
-    if (token == CryptoJS.SHA256(email).toString(CryptoJS.enc.Hex)) {
-        await prisma.user.update({
-            where: { email: email },
-            data: { attivazione: true }
-        });
-        res.status(200).json('Account attivato');
+    try {
+        if (!req.query.email || !req.query.token) {
+            return res.status(400).json('Email e token sono obbligatori');
+        }
+        const email = req.query.email;
+        const token = req.query.token;
+        if (token == CryptoJS.SHA256(email).toString(CryptoJS.enc.Hex)) {
+            await prisma.user.update({
+                where: { email: email },
+                data: { attivazione: true }
+            });
+            res.status(200).json('Account attivato');
+        }
+        else {
+            res.status(401).json('Token non valido');
+        }
     }
-    else {
-        res.status(401).json('Token non valido');
+    catch (error) {
+        res.status(500).json('Errore interno');
     }
 });
 
 userRouter.use((req, res, next) => {
-    res.status(405).json({ error: 'Metodo non autorizzato' });
+    try {
+        res.status(405).json({ error: 'Metodo non autorizzato' });
+    }
+    catch (error) {
+        res.status(500).json('Errore interno');
+    }
 });
 
 module.exports = userRouter;
