@@ -87,6 +87,20 @@
         function crea() {
             window.location.href = 'crea.html';
         }
+        async function logout() {
+            const responce = await fetch('http://127.0.0.1:3000/api/user/logout', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+            if (responce.status != 200) {
+                alert('Errore, riprova più tardi');
+                return;
+            }
+            window.location.href = 'login.html';
+        }
 
     </script>
     <style>
@@ -115,6 +129,7 @@
 </head>
 
 <body onload="checklogin()">
+    <a href="javascript: logout()">Logout</a>
     <div style="text-align: center;">
         <h1>BENVENUTO IN IMTHEREF</h1>
     </div>

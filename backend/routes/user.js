@@ -52,7 +52,7 @@ userRouter.post('/login', passport.authenticate('local'), async (req, res) => {
     });
 });
 
-userRouter.post('/logout', function (req, res, next) {
+userRouter.get('/logout', function (req, res, next) {
     req.logout(function (err) {
         if (err) { return next(err); }
         res.status(200).json('Ok ti sei sloggato');
