@@ -88,29 +88,33 @@
     </script>
 </head>
 
-<body>
-    <h1>Modifica</h1>
-    <form action="javascript: modifica()" method="post">
-        <label for="nome">Nome</label>
-        <input type="text" name="nome" id="nome">
-        <br>
-        <label for="data">Data</label>
-        <input type="datetime-local" name="data" id="data">
-        <br>
-        <label for="categoria">Categoria</label>
-        <input type="text" name="categoria" id="categoria">
-        <br>
-        <label for="rimborso">Rimborso</label>
-        <input type="text" name="rimborso" id="rimborso">
-        <br>
-        <label for="incasso">Incasso</label>
-        <input type="checkbox" name="incasso" id="incasso">
-        <br>
-        <label for="voto">Voto</label>
-        <input type="text" name="voto" id="voto">
-        <br>
-        <input type="submit" value="Modifica">
-    </form>
+<body style="text-align: center;">
+    <div style=" transform: translateY(100%);">
+        <h1>Modifica</h1>
+        <form action="javascript: modifica()" method="post">
+            <label for="nome">Nome</label>
+            <input type="text" name="nome" id="nome">
+            <br>
+            <label for="data">Data</label>
+            <input type="datetime-local" name="data" id="data">
+            <br>
+            <label for="categoria">Categoria</label>
+            <input type="text" name="categoria" id="categoria">
+            <br>
+            <label for="rimborso">Rimborso</label>
+            <input type="text" name="rimborso" id="rimborso">
+            <br>
+            <label for="incasso">Incasso</label>
+            <input type="checkbox" name="incasso" id="incasso">
+            <br>
+            <label for="voto">Voto (per le , utilizzare il .)</label>
+            <br>
+            <input type="text" name="voto" id="voto">
+            <br>
+            <input type="submit" value="Modifica">
+        </form>
+        <a href="index.html">Torna indietro</a>
+    </div>
 
 
 </body>

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IMTHEREF</title>
     <script>
-        var totale = 0, totaleIncassato = 0;
+        var totale = 0, totaleIncassato = 0, totalePartite = 0;
         async function checklogin() {
             let responce;
             try {
@@ -59,29 +59,12 @@
                 alert('Errore, riprova più tardi');
                 return;
             }
-            // ricaricare la pagina per resettare i grafici
             window.location.href = 'index.html';
-            /*totale -= parseFloat(document.getElementById(id).children[4].innerText);
-            if (document.getElementById(id).children[5].children[0].checked) {
-                totaleIncassato -= parseFloat(document.getElementById(id).children[4].innerText);
-            }
-            document.getElementById(id).remove();*/
         }
 
         async function modifica(id) {
             localStorage.setItem('idModifica', id);
             window.location.href = 'modifica.html';
-            /*//const data = document.getElementById(id).children[1].children[0].value;
-            const responce = await fetch(`http://127.0.0.1:3000/api/partita/modifica/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    data: data
-                })
-            });*/
         }
 
         function crea() {
@@ -125,6 +108,14 @@
             font-weight: bold;
             font-size: large;
         }
+
+        body {
+            background-color: #f0f0f0;
+        }
+
+        .divTabella {
+            transform: translateX(10%);
+        }
     </style>
 </head>
 
@@ -133,7 +124,7 @@
     <div style="text-align: center;">
         <h1>BENVENUTO IN IMTHEREF</h1>
     </div>
-    <div>
+    <div class="divTabella">
         <h2>Visualizza le partite</h2>
         <table id="tabella">
             <tbody id="bodyTabella">
@@ -150,12 +141,13 @@
             </tbody>
         </table>
     </div>
-    <div>
+    <div style="transform: translateX(10%);">
         <h3>Totale rimborso: <span id="totale">0</span></h3>
         <h3>Totale incassato: <span id="totaleIncassato">0</span></h3>
+        <h3>Totale partite: <span id="totalePartite">0</span></h3>
+        <input type="button" value="Inserisci partita" onclick="crea()">
     </div>
-    <div><input type="button" value="Inserisci partita" onclick="crea()"></div>
-    <div>
+    <div style="scale: 80%;">
         <canvas id="voti" style="width: 100%;"></canvas>
         <canvas id="rimborsi" style="width: 100%;"></canvas>
         <canvas id="categorie" style="width: 100%;"></canvas>
@@ -177,6 +169,8 @@
                     credentials: 'include'
                 }).then(res => res.json()).then(data => {
                     data.forEach(partita => {
+                        totalePartite++;
+
                         const tr = document.createElement('tr');
                         tr.id = partita.id;
 
@@ -187,7 +181,7 @@
                         const td2 = document.createElement('td');
                         let data = partita.data;
                         data = data.replace('Z', '');
-                        td2.innerHTML = `<input type="datetime-local" name="meeting-time" value="${data}" />`;
+                        td2.innerHTML = `<input type="datetime-local" name="meeting-time" value="${data}" disabled/>`;
                         tr.appendChild(td2);
 
                         const td3 = document.createElement('td');
@@ -237,6 +231,7 @@
                     if (totale != document.getElementById('totale').innerText || totaleIncassato != document.getElementById('totaleIncassato').innerText) {
                         document.getElementById('totale').innerText = totale;
                         document.getElementById('totaleIncassato').innerText = totaleIncassato;
+                        document.getElementById('totalePartite').innerText = totalePartite;
                     }
                 }, 500);
             })
@@ -250,16 +245,33 @@
                 ctx.chart.destroy(); // Distrugge il grafico esistente se presente
             }
             let labels = [];
-            let data = [];
+            let data = {};
+            let media = {};
+            let mediaTotale = 0;
             tabella = document.getElementById('tabella');
             for (let i = 1; i < tabella.rows.length; i++) {
                 if (!tabella.rows[i].children[3].innerText) {
                     continue;
                 }
-                labels.push(tabella.rows[i].children[0].innerText);
-                data.push(tabella.rows[i].children[3].innerText);
-
+                let chiave = tabella.rows[i].children[0].innerText;
+                let valore = tabella.rows[i].children[3].innerText;
+                data[chiave] = valore;
+                mediaTotale += parseFloat(valore);
+                if (i == 1) {
+                    media[chiave] = valore;
+                    continue;
+                }
+                const chiaveData = Object.keys(data).indexOf(chiave)
+                if (chiaveData == 0) {
+                    media[chiave] = valore;
+                }
+                else {
+                    const chiavi = Object.keys(data);
+                    const chiavePrecedente = chiavi[chiaveData - 1];
+                    media[chiave] = (parseFloat(media[chiavePrecedente]) + parseFloat(valore)) / 2;
+                }
             }
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -268,10 +280,29 @@
                         label: '# VOTI',
                         data: data,
                         borderWidth: 1
-                    }]
+                    },
+                    {
+                        label: '# MEDIA VOTI',
+                        data: media,
+                        borderWidth: 1
+                    },
+                    {
+                        label: '# MEDIA TOTALE',
+                        data: Array(Object.keys(data).length).fill(mediaTotale / Object.keys(data).length),
+                        borderWidth: 1
+                    }
+                    ]
+
                 },
                 options: {
                     scales: {
+                        x: {
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 90,
+                                minRotation: 90
+                            }
+                        },
                         y: {
                             beginAtZero: false
                         }
@@ -286,12 +317,10 @@
                 ctx.destroy(); // Distrugge il grafico esistente se presente
             }
             let labels = [];
-            let data = [];
+            let data = {};
             tabella = document.getElementById('tabella');
             for (let i = 1; i < tabella.rows.length; i++) {
-                labels.push(tabella.rows[i].children[0].innerText);
-                data.push(tabella.rows[i].children[4].innerText);
-
+                data[tabella.rows[i].children[0].innerText] = tabella.rows[i].children[4].innerText;
             }
             new Chart(ctx, {
                 type: 'line',
@@ -303,8 +332,22 @@
                         borderWidth: 1
                     }]
                 },
+                /*options: { //con le scritte orizzontali
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }*/
                 options: {
                     scales: {
+                        x: {
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 90,
+                                minRotation: 90
+                            }
+                        },
                         y: {
                             beginAtZero: false
                         }
@@ -325,6 +368,7 @@
             for (let i = 1; i < tabella.rows.length; i++) {
                 occorrenze.push(tabella.rows[i].children[2].innerText);
             }
+
             occorrenze = occorrenze.reduce((acc, curr) => {
                 if (acc[curr]) {
                     acc[curr]++;
@@ -333,19 +377,19 @@
                 }
                 return acc;
             }, {});
-            for (let chiave in occorrenze) {
-                labels.push(chiave);
-                data.push(occorrenze[chiave]);
-            }
+
+
+            const sortedEntries = Object.entries(occorrenze).sort((a, b) => a[1] - b[1]);
+            const sortedObject = Object.fromEntries(sortedEntries);
+            occorrenze = sortedObject;
 
 
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: labels,
                     datasets: [{
                         label: '# N. PARTITE NELLA CATEGORIA',
-                        data: data,
+                        data: occorrenze,
                         borderWidth: 1
                     }]
                 },
