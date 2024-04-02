@@ -318,9 +318,24 @@
             }
             let labels = [];
             let data = {};
+            let mediaTotale = 0;
+            let media = {};
+            let mediaPrecedente = 0;
             tabella = document.getElementById('tabella');
             for (let i = 1; i < tabella.rows.length; i++) {
-                data[tabella.rows[i].children[0].innerText] = tabella.rows[i].children[4].innerText;
+                const value = parseFloat(tabella.rows[i].children[4].innerText);
+                const chiave = tabella.rows[i].children[0].innerText;
+                data[chiave] = value;
+                mediaTotale += value;
+                if (i == 1) {
+                    media[chiave] = value;
+                    mediaPrecedente = value;
+                    continue;
+                }
+                media[chiave] = parseFloat(mediaPrecedente + value) / 2;
+                mediaPrecedente = media[chiave];
+                console.log(mediaPrecedente, value, media[chiave]);
+
             }
             new Chart(ctx, {
                 type: 'line',
@@ -330,7 +345,18 @@
                         label: '# RIMBORSI',
                         data: data,
                         borderWidth: 1
-                    }]
+                    },
+                    {
+                        label: '# MEDIA RIMBORSI',
+                        data: media,
+                        borderWidth: 1
+                    },
+                    {
+                        label: '# MEDIA TOTALE',
+                        data: Array(Object.keys(data).length).fill(mediaTotale / Object.keys(data).length),
+                        borderWidth: 1
+                    }
+                    ]
                 },
                 /*options: { //con le scritte orizzontali
                     scales: {
