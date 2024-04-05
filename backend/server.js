@@ -6,6 +6,7 @@ const port = 3000;
 //const provaRouter = require('./routes/prova');
 const userRouter = require('./routes/user');
 const partitaRouter = require('./routes/partita');
+const categoriaRouter = require('./routes/categoria');
 
 app.use(express.json());
 app.use(cors({
@@ -27,6 +28,7 @@ app.use(passport.session());
 
 app.use('/api/user', userRouter);
 app.use('/api/partita', partitaRouter);
+app.use('/api/categoria', categoriaRouter);
 
 app.listen(port, () => {
     console.log(`backend listening on port ${port}`);

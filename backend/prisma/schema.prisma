@@ -16,12 +16,19 @@ model User {
 }
 
 model Partita {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  nome      String
-  data      DateTime
-  categoria String
-  rimborso  Float
-  incasso   Boolean  @default(false)
-  voto      Float?
-  userId    String   @map("_userId") @db.ObjectId
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  nome        String
+  data        DateTime
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId String    @db.ObjectId
+  rimborso    Float
+  incasso     Boolean   @default(false)
+  voto        Float?
+  userId      String    @map("_userId") @db.ObjectId
+}
+
+model Categoria {
+  id      String    @id @default(auto()) @map("_id") @db.ObjectId
+  nome    String
+  Partita Partita[]
 }

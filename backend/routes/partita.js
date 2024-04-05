@@ -2,7 +2,7 @@ const express = require('express');
 const partitaRouter = express.Router();
 const isLoggedIn = require('../utils/passport');
 const { PrismaClient, Prisma } = require('@prisma/client');
-const { partita } = require('../utils/db');
+//const { partita } = require('../utils/db');
 const prisma = new PrismaClient();
 var ObjectId = require('mongoose').Types.ObjectId;
 
@@ -21,7 +21,9 @@ partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
             data: {
                 nome,
                 data: parsedDate,
-                categoria,
+                categoria: {
+                    connect: { id: categoria }
+                },
                 rimborso,
                 voto,
                 incasso,
@@ -31,9 +33,10 @@ partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
         res.json(partita);
     }
     catch (error) {
-        res.status(500).json({ error: 'Errore interno' });
+        res.status(500).json({ error: 'Errore interno' + error });
     }
 });
+
 partitaRouter.get('/visualizza', isLoggedIn, async (req, res) => {
     try {
         const partite = await prisma.partita.findMany({
@@ -42,12 +45,15 @@ partitaRouter.get('/visualizza', isLoggedIn, async (req, res) => {
             },
             orderBy: {
                 data: 'asc'
+            },
+            include: {
+                categoria: true,
             }
         });
         res.json(partite);
     }
     catch (error) {
-        res.status(500).json({ error: 'Errore interno' });
+        res.status(500).json({ error: 'Errore interno' + error });
     }
 });
 
@@ -60,6 +66,9 @@ partitaRouter.get('/visualizza/:id', isLoggedIn, async (req, res) => {
             where: {
                 userId: req.session.passport.user,
                 id: req.params.id
+            },
+            include: {
+                categoria: true,
             }
         });
         if (partite.length === 0) {
@@ -68,7 +77,7 @@ partitaRouter.get('/visualizza/:id', isLoggedIn, async (req, res) => {
         res.json(partite);
     }
     catch (error) {
-        res.status(500).json({ error: 'Errore interno' });
+        res.status(500).json({ error: 'Errore interno' + error });
     }
 });
 
@@ -89,6 +98,7 @@ partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
         const { nome, data, categoria, rimborso, voto, incasso } = req.body;
         let parsedDate;
         if (data != undefined) {
+            console.log(data);
             parsedDate = new Date(data); // Converte la stringa data in un oggetto Date
             if (parsedDate.toString() === 'Invalid Date') {
                 return res.status(400).json({ error: 'Data non valida' });
@@ -127,7 +137,7 @@ partitaRouter.delete('/elimina/:id', isLoggedIn, async (req, res) => {
         res.json(partita);
     }
     catch (error) {
-        res.status(500).json({ error: 'Errore interno' });
+        res.status(500).json({ error: 'Errore interno' + error });
     }
 });
 

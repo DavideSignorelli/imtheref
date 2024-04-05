@@ -39,7 +39,7 @@
                 const partita = await response.json();
                 document.getElementById("nome").value = partita[0].nome;
                 document.getElementById("data").value = partita[0].data.replace('Z', '');
-                document.getElementById("categoria").value = partita[0].categoria;
+                document.getElementById("categoria").value = partita[0].categoria.id;
                 document.getElementById("rimborso").value = partita[0].rimborso;
                 document.getElementById("incasso").checked = partita[0].incasso;
                 document.getElementById("voto").value = partita[0].voto;
@@ -47,15 +47,65 @@
                 alert("Errore nel recupero della partita");
             }
         }
-        ottieniPartita();
 
+        async function popolaCategoria() {
+            const responce = await fetch('http://127.0.0.1:3000/api/categoria/visualizza', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+            if (responce.status != 200) {
+                alert("Errore nel caricamento delle categorie");
+                return;
+            }
+            const categorie = await responce.json();
+            const select = document.getElementById("categoria");
+            for (let i = 0; i < categorie.length; i++) {
+                const option = document.createElement("option");
+                option.value = categorie[i].id;
+                option.text = categorie[i].nome;
+                select.appendChild(option);
+            }
+            const option = document.createElement("option");
+            option.value = "altra";
+            option.text = "Altra categoria";
+            select.appendChild(option);
+        }
+
+        async function creaCategoria() {
+            const nome = document.getElementById("altraCategoria").value;
+            const response = await fetch('http://127.0.0.1:3000/api/categoria/crea', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome
+                }),
+                credentials: 'include'
+            });
+            if (response.status == 200) {
+                return response.json();
+            } else {
+                alert("Errore nella creazione della categoria " + response);
+                window.location.href = 'index.html';
+            }
+        }
 
 
         async function modifica() {
             const id = localStorage.getItem("idModifica");
             const nome = document.getElementById("nome").value;
             const data = document.getElementById("data").value;
-            const categoria = document.getElementById("categoria").value;
+            let categoria;
+            if (document.getElementById("categoria").value == "altra") {
+                let categoriaCreata = await creaCategoria();
+                categoria = categoriaCreata.id;
+            }
+            else
+                categoria = document.getElementById("categoria").value;
             const rimborso = parseFloat(document.getElementById("rimborso").value);
             const incasso = document.getElementById("incasso").checked;
             const voto = parseFloat(document.getElementById("voto").value);
@@ -75,44 +125,51 @@
                     voto
                 })
             });
-            if (responce.status != 200) {
-                alert('Errore, riprova più tardi');
-            }
-
             if (responce.ok) {
                 window.location.href = "index.html";
             } else {
                 alert("Errore nella modifica");
             }
         }
+        function checkAltro() {
+            const select = document.getElementById("categoria");
+            const altro = document.getElementById("altraCategoria");
+            const testo = document.getElementById("testoAltraCategoria");
+            if (select.value == "altra") {
+                altro.hidden = false;
+                testo.hidden = false;
+            } else {
+                altro.hidden = true;
+                testo.hidden = true;
+            }
+        }
     </script>
 </head>
 
 <body style="text-align: center;">
-    <div style=" transform: translateY(100%);">
+    <div style=" transform: translateY(20%);">
         <h1>Modifica</h1>
         <form action="javascript: modifica()" method="post">
-            <label for="nome">Nome</label>
-            <input type="text" name="nome" id="nome">
-            <br>
-            <label for="data">Data</label>
-            <input type="datetime-local" name="data" id="data">
-            <br>
-            <label for="categoria">Categoria</label>
-            <input type="text" name="categoria" id="categoria">
-            <br>
-            <label for="rimborso">Rimborso</label>
-            <input type="text" name="rimborso" id="rimborso">
-            <br>
-            <label for="incasso">Incasso</label>
-            <input type="checkbox" name="incasso" id="incasso">
-            <br>
-            <label for="voto">Voto (per le , utilizzare il .)</label>
-            <br>
-            <input type="text" name="voto" id="voto">
-            <br>
-            <input type="submit" value="Modifica">
+            <label for="nome">Gara:</label><br>
+            <input type="text" id="nome" name="nome"><br>
+            <label for="data">Data:</label><br>
+            <input type="datetime-local" id="data" name="data"><br>
+            <label for="categoria">Categoria:</label><br>
+            <select id="categoria" name="categoria" onchange="checkAltro()"></select><br>
+            <label for="altraCategoria" id="testoAltraCategoria" hidden>Altra categoria:</label><br>
+            <input type="text" id="altraCategoria" name="altro" hidden><br>
+            <label for="rimborso">Rimborso:</label><br>
+            <input type="text" id="rimborso" name="rimborso"><br>
+            <label for="incasso">Incasso:</label><br>
+            <input type="checkbox" id="incasso" name="incasso"><br>
+            <label for="voto">Voto: (non obbligatorio)</label><br>
+            <input type="text" id="voto" name="voto"><br><br>
+            <input type="submit" value="Submit">
         </form>
+        <script>
+            popolaCategoria();
+            ottieniPartita();
+        </script>
         <a href="index.html">Torna indietro</a>
     </div>
 

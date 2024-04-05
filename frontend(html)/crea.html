@@ -24,10 +24,37 @@
             }
         }
         checklogin();
+
+        async function creaCategoria() {
+            const nome = document.getElementById("altraCategoria").value;
+            const response = await fetch('http://127.0.0.1:3000/api/categoria/crea', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nome
+                }),
+                credentials: 'include'
+            });
+            if (response.status == 200) {
+                return response.json();
+            } else {
+                alert("Errore nella creazione della categoria " + response);
+                window.location.href = 'index.html';
+            }
+        }
+
         async function crea() {
             const nome = document.getElementById("nome").value;
             const data = document.getElementById("data").value;
-            const categoria = document.getElementById("categoria").value;
+            let categoria;
+            if (document.getElementById("categoria").value == "altra") {
+                let categoriaCreata = await creaCategoria();
+                categoria = categoriaCreata.id;
+            }
+            else
+                categoria = document.getElementById("categoria").value;
             const rimborso = parseFloat(document.getElementById("rimborso").value);
             const incasso = document.getElementById("incasso").checked;
             const voto = parseFloat(document.getElementById("voto").value);
@@ -39,7 +66,7 @@
                 body: JSON.stringify({
                     nome: nome,
                     data: data,
-                    categoria: categoria,
+                    categoria,
                     rimborso: rimborso,
                     incasso: incasso,
                     voto: voto
@@ -53,6 +80,45 @@
                 alert("Errore nella creazione della partita");
             }
         }
+        async function popolaCategoria() {
+            const responce = await fetch('http://127.0.0.1:3000/api/categoria/visualizza', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include'
+            });
+            if (responce.status != 200) {
+                alert("Errore nel caricamento delle categorie");
+                return;
+            }
+            const categorie = await responce.json();
+            const select = document.getElementById("categoria");
+            for (let i = 0; i < categorie.length; i++) {
+                const option = document.createElement("option");
+                option.value = categorie[i].id;
+                option.text = categorie[i].nome;
+                select.appendChild(option);
+            }
+            const option = document.createElement("option");
+            option.value = "altra";
+            option.text = "Altra categoria";
+            select.appendChild(option);
+        }
+
+        function checkAltro() {
+            const select = document.getElementById("categoria");
+            const altro = document.getElementById("altraCategoria");
+            const testo = document.getElementById("testoAltraCategoria");
+            if (select.value == "altra") {
+                altro.hidden = false;
+                testo.hidden = false;
+            } else {
+                altro.hidden = true;
+                testo.hidden = true;
+            }
+        }
+
     </script>
 </head>
 
@@ -63,7 +129,9 @@
         <label for="data">Data:</label><br>
         <input type="datetime-local" id="data" name="data"><br>
         <label for="categoria">Categoria:</label><br>
-        <input type="text" id="categoria" name="categoria"><br>
+        <select id="categoria" name="categoria" onchange="checkAltro()"></select><br>
+        <label for="altraCategoria" id="testoAltraCategoria" hidden>Altra categoria:</label><br>
+        <input type="text" id="altraCategoria" name="altro" hidden><br>
         <label for="rimborso">Rimborso:</label><br>
         <input type="text" id="rimborso" name="rimborso"><br>
         <label for="incasso">Incasso:</label><br>
@@ -72,6 +140,9 @@
         <input type="text" id="voto" name="voto"><br><br>
         <input type="submit" value="Submit">
     </form>
+    <script>
+        popolaCategoria();
+    </script>
 </body>
 
 </html>
