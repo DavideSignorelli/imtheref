@@ -13,6 +13,7 @@ partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
         if (!nome || !data || !categoria || !rimborso) {
             return res.status(400).json({ error: 'Nome, data, categoria e rimborso sono obbligatori' });
         }
+        console.log(data);
         const parsedDate = new Date(data); // Converte la stringa data in un oggetto Date
         if (parsedDate.toString() === 'Invalid Date') {
             return res.status(400).json({ error: 'Data non valida' });
@@ -96,10 +97,8 @@ partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
             return res.status(404).json({ error: 'Partita non trovata' });
         }
         const { nome, data, categoria, rimborso, voto, incasso } = req.body;
-        let parsedDate;
+        const parsedDate = new Date(data);
         if (data != undefined) {
-            console.log(data);
-            parsedDate = new Date(data); // Converte la stringa data in un oggetto Date
             if (parsedDate.toString() === 'Invalid Date') {
                 return res.status(400).json({ error: 'Data non valida' });
             }
@@ -111,7 +110,9 @@ partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
             data: {
                 nome,
                 data: parsedDate,
-                categoria,
+                categoria: {
+                    connect: { id: categoria }
+                },
                 rimborso,
                 voto,
                 incasso
@@ -120,6 +121,7 @@ partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
         res.json(partita);
     }
     catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Errore interno' + error });
     }
 });
