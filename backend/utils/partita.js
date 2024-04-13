@@ -4,21 +4,24 @@ const { ottieniCategoriaDaNome, creaCategoria } = require('./categoria');
 
 async function ottieniPartitaDaTesto(testo) {
     let buff = new Buffer.from(testo, 'base64');
-    let decripted = buff.toString('ascii');
+    let decripted = buff.toString('utf-8');
+
+
 
     const indexes = [
-        "attività",
+        "attivita",
         "comitato",
         "categoria",
+        "descrizione_torneo",
         "girone",
         "giornata",
-        "numero gara",
+        "numero_gara",
         "gara",
         "data",
         "ora",
         "campo",
         "indirizzo",
-        "località",
+        "localita",
         "provincia",
         "distanza",
         "rimborso"
@@ -27,6 +30,11 @@ async function ottieniPartitaDaTesto(testo) {
 
     const dati = {};
     for (let i = 0; i < righe.length; i++) {
+        let campo = righe[i].split(":")[0].trim();
+        let valore = righe[i].split(":")[1].trim();
+        if (indexes[i] == "descrizione_torneo" && campo != "Descr. Torneo") {
+            indexes.splice(i, 1);
+        }
         if (indexes[i] == "ora") {
             dati[indexes[i]] = righe[i].split(":")[1].trim() + ":" + righe[i].split(":")[2].trim();
             continue;
@@ -35,35 +43,31 @@ async function ottieniPartitaDaTesto(testo) {
             dati[indexes[i]] = parseFloat(righe[i].split(":")[1].trim().replace(",", "."));
             continue;
         }
-        dati[indexes[i]] = righe[i].split(":")[1].trim();
+        dati[indexes[i]] = valore;
     }
 
     if (dati.categoria) {
         const categoria = await ottieniCategoriaDaNome(dati.categoria);
-        //console.log(categoria);
-        if (categoria.length > 0) {
-            //console.log("esiste");
+        if (categoria != null) {
             dati.categoria = categoria[0].id;
-            //console.log(dati.categoria, categoria);
         }
         else {
-            //console.log("non esiste");
-            creaCategoria(dati.categoria).then((categoria) => {
-                dati.categoria = categoria.id;
-            }).catch((error) => {
-                console.log(error);
-            });
+            let nuovaCategoria = await creaCategoria(dati.categoria);
+            dati.categoria = nuovaCategoria.id;
         }
     }
 
 
-    //console.log(dati);
     if (dati.data) {
         dati.data = dati.data.split(" ")[1];
-        dati.data = new Date(dati.data.split("/")[2], dati.data.split("/")[1], dati.data.split("/")[0], dati.ora.split(":")[0], dati.ora.split(":")[1]);
+        let giorno = dati.data.split("/")[0];
+        let mese = dati.data.split("/")[1];
+        let anno = dati.data.split("/")[2];
+        let ora = dati.ora.split(":")[0];
+        let minuti = dati.ora.split(":")[1];
+        dati.data = new Date(Date.UTC(anno, mese - 1, giorno, ora, minuti, 0, 0));
     }
 
-    //console.log(dati);
     return dati;
 }
 

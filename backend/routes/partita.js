@@ -35,7 +35,7 @@ partitaRouter.post('/crea', isLoggedIn, async (req, res) => {
         res.json(partita);
     }
     catch (error) {
-        res.status(500).json({ error: 'Errore interno' + error });
+        return res.status(500).json({ error: 'Errore interno' + error });
     }
 });
 
@@ -60,7 +60,8 @@ partitaRouter.post('/creaDaTesto', isLoggedIn, async (req, res) => {
         res.json(partita);
     }
     catch (error) {
-        res.status(500).json({ error: 'Errore interno' + error });
+        console.log(error);
+        return res.status(500).json({ error: 'Errore interno' + error });
     }
 });
 
@@ -80,7 +81,7 @@ partitaRouter.get('/visualizza', isLoggedIn, async (req, res) => {
         res.json(partite);
     }
     catch (error) {
-        res.status(500).json({ error: 'Errore interno' + error });
+        return res.status(500).json({ error: 'Errore interno' + error });
     }
 });
 
@@ -104,7 +105,7 @@ partitaRouter.get('/visualizza/:id', isLoggedIn, async (req, res) => {
         res.json(partite);
     }
     catch (error) {
-        res.status(500).json({ error: 'Errore interno' + error });
+        return res.status(500).json({ error: 'Errore interno' + error });
     }
 });
 
@@ -148,7 +149,7 @@ partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
     }
     catch (error) {
         console.log(error);
-        res.status(500).json({ error: 'Errore interno' + error });
+        return res.status(500).json({ error: 'Errore interno' + error });
     }
 });
 
@@ -165,13 +166,13 @@ partitaRouter.delete('/elimina/:id', isLoggedIn, async (req, res) => {
         res.json(partita);
     }
     catch (error) {
-        res.status(500).json({ error: 'Errore interno' + error });
+        return res.status(500).json({ error: 'Errore interno' + error });
     }
 });
 
 
 partitaRouter.use((req, res, next) => {
-    res.status(405).json({ error: 'Metodo non autorizzato' });
+    return res.status(405).json({ error: 'Metodo non autorizzato' });
 });
 
 
