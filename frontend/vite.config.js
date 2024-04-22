@@ -7,7 +7,7 @@ export default defineConfig({
     proxy: {
       // with options: http://localhost:5173/api/bar-> http://localhost:3000/bar
       '/api': {
-        target: 'http://localhost:3000/api',
+        target: 'http://localhost:3000/',
         changeOrigin: true,
       },
     },
