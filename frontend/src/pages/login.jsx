@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Button from '@mui/material/Button';
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -72,7 +73,7 @@ function Login() {
                         <p id='loginErrato' style={{ color: 'red', fontSize: '15px', visibility: 'hidden' }}>*L'Email o la Password sono sbagliati</p>
                     </div>
                     <div>
-                        <button onClick={login} id="loginButton">Login</button>
+                        <Button onClick={login} id="loginButton" variant="contained">Hello world</Button>;
                         <Link to="/signup">
                             <button id="resetPasswordButton">Registrati</button>
                         </Link>
