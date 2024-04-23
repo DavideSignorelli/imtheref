@@ -1,6 +1,41 @@
+import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Button from '@mui/material/Button';
+import Button from '@mui/joy/Button';
+import Links from '@mui/joy/Link';
+import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
+import FormControl from '@mui/joy/FormControl';
+import FormLabel from '@mui/joy/FormLabel';
+import Input from '@mui/joy/Input';
+import Typography from '@mui/joy/Typography';
+import Sheet from '@mui/joy/Sheet';
+
+
+function ModeToggle() {
+    const { mode, setMode } = useColorScheme();
+    const [mounted, setMounted] = React.useState(false);
+
+    // necessary for server-side rendering
+    // because mode is undefined on the server
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+    if (!mounted) {
+        return null;
+    }
+
+    return (
+        <Button
+            variant="outlined"
+            onClick={() => {
+                setMode(mode === 'light' ? 'dark' : 'light');
+            }}
+        >
+            {mode === 'light' ? 'Turn dark' : 'Turn light'}
+        </Button>
+    );
+}
+
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -47,40 +82,62 @@ function Login() {
 
 
     return (
-        <div id="box">
-            <div>
-                <h1>Accesso al portale</h1>
-                <form onSubmit={login}>
-                    <div>
-                        <label htmlFor="email">Email</label>
-                        <input onChange={(event) => setEmail(event.target.value)}
-                            type="text"
-                            id="email"
-                            name="email"
-                            placeholder="Inserisci la tua email"
-                            required=""
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="password">Password</label>
-                        <input onChange={(event) => setPassword(event.target.value)}
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Inserisci la tua password"
-                            required=""
-                        />
-                        <p id='loginErrato' style={{ color: 'red', fontSize: '15px', visibility: 'hidden' }}>*L'Email o la Password sono sbagliati</p>
-                    </div>
-                    <div>
-                        <Button onClick={login} id="loginButton" variant="contained">Hello world</Button>;
-                        <Link to="/signup">
-                            <button id="resetPasswordButton">Registrati</button>
-                        </Link>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <CssVarsProvider>
+            <ModeToggle />
+            <Sheet
+                sx={{
+                    width: 300,
+                    mx: 'auto', // margin left & right
+                    my: 4, // margin top & bottom
+                    py: 3, // padding top & bottom
+                    px: 2, // padding left & right
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                    borderRadius: 'sm',
+                    boxShadow: 'md',
+                }}
+            >
+                <Typography level="h4" component="h1">
+                    IMTHEREF
+                </Typography>
+                <Typography level="body-sm">Accesso al portale</Typography>
+                <FormControl>
+                    <FormLabel>Email</FormLabel>
+                    <Input
+                        // html input attribute
+                        name="email"
+                        type="email"
+                        placeholder="johndoe@email.com"
+                        onChange={(event) => setEmail(event.target.value)}
+                    />
+                </FormControl>
+                <FormControl>
+                    <FormLabel>Password</FormLabel>
+                    <Input
+                        name="password"
+                        type="password"
+                        placeholder="password"
+                        onChange={(event) => setPassword(event.target.value)}
+                    />
+                </FormControl>
+                <Button
+                    sx={{ mt: 1 /* margin top */ }}
+                    onClick={login}
+
+                >
+                    Log in
+                </Button>
+                <Typography
+                    endDecorator={<Links href="/signup">Sign up</Links>}
+                    fontSize="sm"
+                    sx={{ alignSelf: 'center' }}
+                >
+                    Don't have an account?
+                </Typography>
+
+            </Sheet>
+        </CssVarsProvider>
     );
 }
 
