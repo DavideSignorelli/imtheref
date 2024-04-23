@@ -23,6 +23,10 @@ const router = createBrowserRouter([
         element: <Login />,
     },
     {
+        path: "/",
+        element: <Navigate to="/home" replace />,
+    },
+    {
         path: "home",
         element: (
             <RequireAuth>
