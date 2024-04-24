@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Form, useNavigate } from 'react-router-dom';
 import Button from '@mui/joy/Button';
 import Links from '@mui/joy/Link';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
@@ -9,27 +9,13 @@ import FormLabel from '@mui/joy/FormLabel';
 import Input from '@mui/joy/Input';
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
-import useMediaQuery from '@mui/material/useMediaQuery';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { CssBaseline } from '@mui/material';
+
 
 
 
 
 
 function Login() {
-    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-    const theme = React.useMemo(
-        () =>
-            createTheme({
-                palette: {
-                    mode: prefersDarkMode ? 'dark' : 'light',
-                },
-            }),
-        [prefersDarkMode],
-    );
-
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState();
     const navigate = useNavigate();
@@ -40,24 +26,29 @@ function Login() {
             password,
             email
         };
-        try {
-            const response = await fetch("/api/user/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dati)
-            });
+        const response = await fetch("/api/user/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dati)
+        });
 
+        console.log(response.status);
+        console.log(document.getElementById("loginErrato").hidden);
+        if (response.status === 401) {
+            document.getElementById("loginErrato").hidden = true;
+        }
+        else {
             const result = await response.json();
+
             if (response.status !== 200) {
                 alert(result.message);
             }
             navigate("/home");
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Errore durante il login " + error);
+
         }
+
     }
 
     const [loggedIn, setLoggedIn] = useState();
@@ -111,21 +102,32 @@ function Login() {
                         placeholder="password"
                         onChange={(event) => setPassword(event.target.value)}
                     />
-                </FormControl>
-                <Button
-                    sx={{ mt: 1 /* margin top */ }}
-                    onClick={login}
+                    <Typography
+                        fontSize="sm"
+                        style={{ color: 'red', visibility: 'hidden' }}
+                        id="loginErrato"
 
-                >
-                    Log in
-                </Button>
-                <Typography
-                    endDecorator={<Links href="/signup">Sign up</Links>}
-                    fontSize="sm"
-                    sx={{ alignSelf: 'center' }}
-                >
-                    Don't have an account?
-                </Typography>
+                    >
+                        Email o password sbagliata
+                    </Typography>
+                </FormControl>
+                <FormControl>
+                    <Button
+                        sx={{ mt: 1 /* margin top */ }}
+                        onClick={login}
+                    >
+                        Log in
+                    </Button>
+                </FormControl>
+                <FormControl>
+                    <Typography
+                        endDecorator={<Links href="/signup">Sign up</Links>}
+                        fontSize="sm"
+                        sx={{ alignSelf: 'center' }}
+                    >
+                        Don't have an account?
+                    </Typography>
+                </FormControl>
 
             </Sheet>
         </CssVarsProvider>
