@@ -48,22 +48,32 @@ userRouter.post('/registrazione', async (req, res) => {
 
 });
 
-userRouter.post('/login', passport.authenticate('local'), async (req, res) => {
-    try {
-        const user = req.user;
-        const attivato = await findByEmail(user.email);
-        if (!attivato.attivazione) {
-            return res.status(401).json('Account non attivato');
+userRouter.post('/login', async (req, res, next) => {
+    passport.authenticate('local', async (err, user, info) => {
+        try {
+            if (err) {
+                return next(err); // Passa l'errore al gestore degli errori
+            }
+            if (!user) {
+                return res.status(401).json(info.message); // Utente non trovato o credenziali errate
+            }
+            const attivato = await findByEmail(user.email);
+            if (!attivato.attivazione) {
+                return res.status(401).json('Account non attivato'); // Account non attivato
+            } else {
+                req.login(user, function (err) {
+                    if (err) {
+                        return next(err); // Passa l'errore al gestore degli errori
+                    }
+                    return res.status(200).json(user); // Login riuscito
+                });
+            }
+        } catch (error) {
+            return next(error); // Passa l'errore al gestore degli errori
         }
-        req.login(user, function (err) {
-            if (err) { return res.status(401) }
-            return res.status(200).json(user)
-        });
-    }
-    catch (error) {
-        res.status(500).json('Errore interno');
-    }
+    })(req, res, next);
 });
+
 
 userRouter.get('/logout', function (req, res, next) {
     try {
@@ -79,7 +89,7 @@ userRouter.get('/logout', function (req, res, next) {
 
 userRouter.get('/isloggedin', isLoggedIn, function (req, res) {
     try {
-        res.status(200).json('Ok sei sloggato');
+        res.status(200).json('Ok sei loggato');
     }
     catch (error) {
         res.status(500).json('Errore interno');
