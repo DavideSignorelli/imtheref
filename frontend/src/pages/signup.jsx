@@ -10,48 +10,29 @@ import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
 
 
-
-function Login() {
+function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState();
     const [loggedIn, setLoggedIn] = useState();
-    const [loginErrato, setLoginErrato] = useState(false);
     const navigate = useNavigate();
 
-    async function login() {
-        event.preventDefault(); // Previeni il comportamento predefinito di submit del modulo
+    async function signup() {
+        event.preventDefault();
         const dati = {
             password,
             email
         };
-        const response = await fetch("/api/user/login", {
+        const response = await fetch("/api/user/registrazione", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(dati)
         });
-
-        if (response.status === 401) {
-            //alert(await response.json());
-            if (await response.json() === "Account non attivato") {
-                alert("Account non attivato");
-                return;
-            }
-            setLoginErrato(true);
+        if (response.status === 200) {
+            navigate("/login");
         }
-        else {
-            const result = await response.json();
-
-            if (response.status !== 200) {
-                alert(result.message);
-            }
-            navigate("/home");
-
-        }
-
     }
-
 
     useEffect(() => {
         fetch("/api/user/isLoggedIn", { credentials: "include" })
@@ -61,7 +42,6 @@ function Login() {
     if (loggedIn === true) {
         navigate("/home");
     }
-
 
 
     return (
@@ -80,13 +60,12 @@ function Login() {
             }}
         >
             <Typography level="h4" component="h1">
-                IMTHEREF
+                Registrazione
             </Typography>
-            <Typography level="body-sm">Accesso al portale</Typography>
+            <Typography level="body-sm">Registrazione al portale</Typography>
             <FormControl>
                 <FormLabel>Email</FormLabel>
                 <Input
-                    // html input attribute
                     name="email"
                     type="email"
                     placeholder="imtheref@email.com"
@@ -101,38 +80,26 @@ function Login() {
                     placeholder="password"
                     onChange={(event) => setPassword(event.target.value)}
                 />
-                {
-                    loginErrato &&
-                    <Typography
-                        fontSize="sm"
-                        style={{ color: 'red' }}
-                        id="loginErrato"
-
-                    >
-                        Email o password sbagliata
-                    </Typography>
-                }
             </FormControl>
             <FormControl>
                 <Button
                     sx={{ mt: 1 /* margin top */ }}
-                    onClick={login}
+                    onClick={signup}
                 >
-                    Log in
+                    Sign up
                 </Button>
             </FormControl>
             <FormControl>
                 <Typography
-                    endDecorator={<Links href="/signup">Sign up</Links>}
+                    endDecorator={<Links href="/login">Log in</Links>}
                     fontSize="sm"
                     sx={{ alignSelf: 'center' }}
                 >
-                    Don't have an account?
+                    Already have an account?
                 </Typography>
             </FormControl>
-
         </Sheet>
-    );
+    )
 }
 
-export default Login;
+export default Signup;

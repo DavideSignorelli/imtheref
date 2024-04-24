@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "./pages/login.jsx";
 import Home from "./pages/home.jsx";
+import Signup from "./pages/signup.jsx";
 
 function RequireAuth({ children }) {
     const [loggedIn, setLoggedIn] = useState();
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
     {
         path: "login",
         element: <Login />,
+    },
+    {
+        path: "signup",
+        element: <Signup />,
     },
     {
         path: "/",
