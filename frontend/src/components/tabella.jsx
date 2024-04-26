@@ -6,21 +6,25 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-
-
-
+import { useState } from 'react';
 
 async function getDati() {
-    const response = await fetch("/api/partita/visualizza", {
-        credentials: "include"
-    });
-    return await response.json();
+    if (window.location.pathname === "/home") {
+        const response = await fetch("/api/partita/visualizza", {
+            credentials: "include"
+        });
+        return await response.json();
+    }
 }
 
-const rows = await getDati();
-
+//const rows = await getDati();
 
 export default function Tabella() {
+    const [rows, setRows] = useState([]);
+    React.useEffect(() => {
+        getDati().then((data) => setRows(data));
+    }, []);
+
     return (
 
 

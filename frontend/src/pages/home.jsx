@@ -1,10 +1,12 @@
 import Tabella from "../components/tabella";
+import Sidebar from "../components/sidebar";
 
 function home() {
     return (
-
-        <Tabella />
-
+        <div>
+            <Sidebar />
+            <Tabella />
+        </div>
     );
 }
 
