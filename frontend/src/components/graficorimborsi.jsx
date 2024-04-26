@@ -23,7 +23,7 @@ ChartJS.register(
 );
 
 async function getDati() {
-    if (window.location.pathname === "/voti") {
+    if (window.location.pathname === "/rimborsi") {
         const response = await fetch("/api/partita/visualizza", {
             credentials: "include"
         });
@@ -58,23 +58,23 @@ export const options = {
 
 
 
-export default function GraficoVoti() {
+export default function GraficoRimborsi() {
     const [rows, setRows] = useState([]);
     const [media, setMedia] = useState([]);
     const [mediaTotale, setMediaTotale] = useState(0);
 
     React.useEffect(() => {
         getDati().then((data) => {
-            const filteredData = data.filter((row) => row.voto !== null);
+            const filteredData = data.filter((row) => row.rimborso !== null);
             setRows(filteredData);
             for (let i = 0; i < filteredData.length; i++) {
-                setMediaTotale((mediaTotale) => mediaTotale + filteredData[i].voto);
+                setMediaTotale((mediaTotale) => mediaTotale + filteredData[i].rimborso);
             }
             setMediaTotale((mediaTotale) => mediaTotale / filteredData.length);
             for (let i = 0; i < filteredData.length; i++) {
                 let mediaCalcolata = 0;
                 for (let j = 0; j < i + 1; j++) {
-                    mediaCalcolata += filteredData[j].voto;
+                    mediaCalcolata += filteredData[j].rimborso;
                 }
                 mediaCalcolata = mediaCalcolata / (i + 1);
                 setMedia((media) => [...media, mediaCalcolata]);
@@ -88,13 +88,13 @@ export default function GraficoVoti() {
         labels: rows.map((row) => row.gara),
         datasets: [
             {
-                label: '# VOTI',
-                data: rows.map((row) => row.voto),
+                label: '# RIMBORSI',
+                data: rows.map((row) => row.rimborso),
                 borderColor: 'rgb(255, 99, 132)',
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',
             },
             {
-                label: '# MEDIA VOTI',
+                label: '# MEDIA RIMBORSI',
                 data: media,
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',

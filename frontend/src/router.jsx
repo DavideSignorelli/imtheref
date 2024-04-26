@@ -57,6 +57,7 @@ const router = createBrowserRouter([
         path: "rimborsi",
         element: (
             <RequireAuth>
+                <Sidebar />
                 <Rimborsi />
             </RequireAuth>
         ),
@@ -74,6 +75,7 @@ const router = createBrowserRouter([
         path: "categorie",
         element: (
             <RequireAuth>
+                <Sidebar />
                 <Categorie />
             </RequireAuth>
         ),
