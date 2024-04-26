@@ -62,7 +62,11 @@ function Login() {
         navigate("/home");
     }
 
-
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            login(); // chiamata alla funzione di login
+        }
+    };
 
     return (
         <Sheet
@@ -100,6 +104,7 @@ function Login() {
                     type="password"
                     placeholder="password"
                     onChange={(event) => setPassword(event.target.value)}
+                    onKeyPress={handleKeyPress}
                 />
                 {
                     loginErrato &&
