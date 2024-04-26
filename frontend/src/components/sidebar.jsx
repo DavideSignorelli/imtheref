@@ -70,7 +70,7 @@ export default function TemporaryDrawer() {
                 </ListItemButton>
                 <Collapse in={StatisticheAperta} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 5 }}>
+                        <ListItemButton sx={{ pl: 5 }} onClick={() => navigate("/voti")}>
                             <ListItemIcon>
                                 <ThumbsUpDownIcon />
                             </ListItemIcon>
@@ -78,7 +78,7 @@ export default function TemporaryDrawer() {
                         </ListItemButton>
                     </List>
                     <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 5 }}>
+                        <ListItemButton sx={{ pl: 5 }} onClick={() => navigate("/rimborsi")}>
                             <ListItemIcon>
                                 <PaymentsIcon />
                             </ListItemIcon>
@@ -86,7 +86,7 @@ export default function TemporaryDrawer() {
                         </ListItemButton>
                     </List>
                     <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 5 }}>
+                        <ListItemButton sx={{ pl: 5 }} onClick={() => navigate("/categorie")}>
                             <ListItemIcon>
                                 <Groups3Icon />
                             </ListItemIcon>

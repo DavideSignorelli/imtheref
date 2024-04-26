@@ -4,6 +4,9 @@ import Login from "./pages/login.jsx";
 import Home from "./pages/home.jsx";
 import Signup from "./pages/signup.jsx";
 import Logout from "./pages/logout.jsx";
+import Rimborsi from "./pages/rimborsi.jsx";
+import Voti from "./pages/voti.jsx";
+import Categorie from "./pages/categorie.jsx";
 
 function RequireAuth({ children }) {
     const [loggedIn, setLoggedIn] = useState();
@@ -47,6 +50,30 @@ const router = createBrowserRouter([
                 <Logout />
             </RequireAuth>
         ),
-    }
+    },
+    {
+        path: "rimborsi",
+        element: (
+            <RequireAuth>
+                <Rimborsi />
+            </RequireAuth>
+        ),
+    },
+    {
+        path: "voti",
+        element: (
+            <RequireAuth>
+                <Voti />
+            </RequireAuth>
+        ),
+    },
+    {
+        path: "categorie",
+        element: (
+            <RequireAuth>
+                <Categorie />
+            </RequireAuth>
+        ),
+    },
 ]);
 export default router;
