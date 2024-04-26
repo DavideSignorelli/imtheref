@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "./pages/login.jsx";
 import Home from "./pages/home.jsx";
 import Signup from "./pages/signup.jsx";
+import Logout from "./pages/logout.jsx";
 
 function RequireAuth({ children }) {
     const [loggedIn, setLoggedIn] = useState();
@@ -36,6 +37,14 @@ const router = createBrowserRouter([
         element: (
             <RequireAuth>
                 <Home />
+            </RequireAuth>
+        ),
+    },
+    {
+        path: "logout",
+        element: (
+            <RequireAuth>
+                <Logout />
             </RequireAuth>
         ),
     }
