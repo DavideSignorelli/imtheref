@@ -7,6 +7,7 @@ import Logout from "./pages/logout.jsx";
 import Rimborsi from "./pages/rimborsi.jsx";
 import Voti from "./pages/voti.jsx";
 import Categorie from "./pages/categorie.jsx";
+import Sidebar from "./components/sidebar.jsx";
 
 function RequireAuth({ children }) {
     const [loggedIn, setLoggedIn] = useState();
@@ -39,6 +40,7 @@ const router = createBrowserRouter([
         path: "home",
         element: (
             <RequireAuth>
+                <Sidebar />
                 <Home />
             </RequireAuth>
         ),
@@ -63,6 +65,7 @@ const router = createBrowserRouter([
         path: "voti",
         element: (
             <RequireAuth>
+                <Sidebar />
                 <Voti />
             </RequireAuth>
         ),
