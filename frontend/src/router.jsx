@@ -8,6 +8,7 @@ import Rimborsi from "./pages/rimborsi.jsx";
 import Voti from "./pages/voti.jsx";
 import Categorie from "./pages/categorie.jsx";
 import Sidebar from "./components/sidebar.jsx";
+import Inserisci from "./pages/inserisci.jsx";
 
 function RequireAuth({ children }) {
     const [loggedIn, setLoggedIn] = useState();
@@ -79,6 +80,16 @@ const router = createBrowserRouter([
                 <Categorie />
             </RequireAuth>
         ),
+    },
+    {
+        path: "inserisci",
+        element: (
+            <RequireAuth>
+                <Sidebar />
+                <Inserisci />
+            </RequireAuth>
+        ),
+
     },
 ]);
 export default router;

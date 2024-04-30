@@ -103,7 +103,7 @@ export default function TemporaryDrawer() {
                 </ListItemButton>
                 <Collapse in={PartiteAperta} timeout="auto" unmountOnExit>
                     <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 5 }}>
+                        <ListItemButton sx={{ pl: 5 }} onClick={() => navigate("/inserisci")}>
                             <ListItemIcon>
                                 <AddToPhotosIcon />
                             </ListItemIcon>
