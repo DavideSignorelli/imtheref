@@ -1,6 +1,8 @@
 const { PrismaClient, Prisma } = require('@prisma/client');
 const prisma = new PrismaClient();
-const { ottieniCategoriaDaNome, creaCategoria } = require('./categoria');
+const { ottieniCategoriaDaId, ottieniCategoriaDaNome, creaCategoria } = require('./categoria');
+
+var ObjectId = require('mongoose').Types.ObjectId;
 
 async function ottieniPartitaDaTesto(testo) {
     let buff = new Buffer.from(testo, 'base64');
@@ -74,13 +76,25 @@ async function ottieniPartitaDaTesto(testo) {
 async function creaPartita(req, dati) {
     try {
         const { gara, data, categoria, rimborso, incasso, voto } = dati;
-        //console.log(dati);
+        let id = categoria;
+        if (ObjectId.isValid(id) === false) {
+            if (await ottieniCategoriaDaNome(id) == null) {
+                const nuovaCategoria = await creaCategoria(categoria);
+                id = nuovaCategoria.id;
+            }
+            else
+                id = await ottieniCategoriaDaNome(id)[0].id;
+        }
+        else
+            if (await ottieniCategoriaDaId(id) == null) {
+                return { error: "Categoria non trovata" };
+            }
         const partita = await prisma.partita.create({
             data: {
                 gara: gara,
                 data: data,
                 categoria: {
-                    connect: { id: categoria }
+                    connect: { id }
                 },
                 rimborso,
                 incasso,

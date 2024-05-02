@@ -21,6 +21,9 @@ function ottieniCategoriaDaId(id) {
             id
         }
     });
+    if (categoria.length == 0) {
+        return null;
+    }
     return categoria;
 }
 
