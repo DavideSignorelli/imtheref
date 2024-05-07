@@ -79,11 +79,13 @@ async function creaPartita(req, dati) {
         let id = categoria;
         if (ObjectId.isValid(id) === false) {
             if (await ottieniCategoriaDaNome(id) == null) {
-                const nuovaCategoria = await creaCategoria(categoria);
-                id = nuovaCategoria.id;
+                const nuovaCategoria = await creaCategoria(id);
+                id = nuovaCategoria.id; //signo ref scadente
             }
-            else
-                id = await ottieniCategoriaDaNome(id)[0].id;
+            else {
+                id = await ottieniCategoriaDaNome(id);
+                id = id[0].id;
+            }
         }
         else
             if (await ottieniCategoriaDaId(id) == null) {
@@ -94,7 +96,7 @@ async function creaPartita(req, dati) {
                 gara: gara,
                 data: data,
                 categoria: {
-                    connect: { id }
+                    connect: { id: id }
                 },
                 rimborso,
                 incasso,
