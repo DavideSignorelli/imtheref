@@ -14,13 +14,23 @@ import Box from '@mui/joy/Box';
 import Divider from '@mui/joy/Divider';
 
 
-
+async function getCategorie() {
+    const response = await fetch("/api/categoria/visualizza", {
+        credentials: "include"
+    });
+    return await response.json();
+}
 
 
 
 
 
 export default function Inserisci() {
+    const [categorie, setCategorie] = useState([]);
+    React.useEffect(() => {
+        getCategorie().then((data) => setCategorie(data));
+    }, []);
+
     const navigate = useNavigate();
     const stileInput = {
         mt: 1
@@ -37,11 +47,35 @@ export default function Inserisci() {
 
     async function inserisci() {
         //conrollo se i campi sono stati compilati
-        if (values.gara === '' || values.data === '' || values.ora === '' || values.categoria === '' || values.rimborso === 0) {
+        const categoria = document.getElementById("categoria").innerHTML;
+        if (values.gara === '' || values.data === '' || values.ora === '' || categoria === '' || values.rimborso === 0) {
             alert("Compila tutti i campi");
+            console.log(values);
             return;
         }
-        console.log(values);
+        const response = await fetch("/api/partita/crea", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(
+                {
+                    gara: values.gara,
+                    data: values.data,
+                    categoria: categoria,
+                    rimborso: parseFloat(values.rimborso),
+                    incasso: values.incasso,
+                    voto: parseFloat(values.voto)
+                }
+            )
+        });
+        if (response.status === 200) {
+            alert("Inserimento avvenuto con successo");
+            navigate("/home");
+        }
+        else {
+            alert("Errore");
+        }
     }
 
     const handleChange = (prop) => (event) => {
@@ -100,11 +134,13 @@ export default function Inserisci() {
                     <Select
                         placeholder="Categoria"
                         sx={stileInput}
+                        id="categoria"
                     >
-                        <Option value="dog" onChange={handleChange("categoria")}>Dog</Option>
-                        <Option value="cat" onChange={handleChange("categoria")}>Cat</Option>
-                        <Option value="fish" onChange={handleChange("categoria")}>Fish</Option>
-                        <Option value="bird" onChange={handleChange("categoria")}>Bird</Option>
+                        {categorie.map((categoria) => (
+                            <Option key={categoria.id} value={categoria.id}>
+                                {categoria.nome}
+                            </Option>
+                        ))}
                     </Select>
                 </FormControl>
                 <FormControl>
