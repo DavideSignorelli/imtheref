@@ -19,7 +19,8 @@ import Tooltip from '@mui/material/Tooltip';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { alpha } from '@mui/material/styles';
-
+import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 async function getDati() {
     if (window.location.pathname === "/home") {
@@ -91,6 +92,27 @@ const headCells = [
     },
 ];
 
+async function eliminaPartita(id) {
+    const response = await fetch(`/api/partita/elimina/${id}`, {
+        method: "DELETE",
+        credentials: "include"
+    });
+    return response.status;
+}
+
+async function elimina(ids) {
+    for (let id of ids) {
+        if (await eliminaPartita(id) == 200) {
+            console.log("Partita eliminata");
+        } else {
+            alert("Errore durante l'eliminazione della partita");
+            return;
+        }
+    }
+    alert("Eliminazione avvenuta con successo");
+    window.location.reload();
+}
+
 
 
 function EnhancedTableHead(props) {
@@ -150,7 +172,8 @@ EnhancedTableHead.propTypes = {
 };
 
 function EnhancedTableToolbar(props) {
-    const { numSelected } = props;
+    const { selected } = props;
+    const numSelected = selected.length;
 
     return (
         <Toolbar
@@ -185,23 +208,18 @@ function EnhancedTableToolbar(props) {
 
             {numSelected > 0 && (
                 <Tooltip title="Delete">
-                    <IconButton>
-                        <DeleteIcon />
-                    </IconButton>
+                    <Button onClick={() => elimina(selected)}><DeleteIcon /></Button>
                 </Tooltip>
             )}
         </Toolbar>
     );
 }
 
-EnhancedTableToolbar.propTypes = {
-    numSelected: PropTypes.number.isRequired,
-};
-
 
 export default function Tabella() {
     const [rows, setRows] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
+    const [ids, setIds] = useState([]);
 
 
     React.useEffect(() => {
@@ -251,6 +269,7 @@ export default function Tabella() {
             );
         }
         setSelected(newSelected);
+        setIds(ids.concat(newSelected));
     };
 
     const handleChangePage = (event, newPage) => {
@@ -277,13 +296,13 @@ export default function Tabella() {
         [rows, order, orderBy, page, rowsPerPage],
     );
 
-    visibleRows
+
 
 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} />
+                <EnhancedTableToolbar selected={selected} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
