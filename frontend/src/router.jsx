@@ -9,6 +9,8 @@ import Voti from "./pages/voti.jsx";
 import Categorie from "./pages/categorie.jsx";
 import Sidebar from "./components/sidebar.jsx";
 import Inserisci from "./pages/inserisci.jsx";
+import InserisciDaDesignazione from "./pages/inserisci_da_designazione.jsx";
+import InserisciDaMail from "./pages/inserisci_da_mail.jsx";
 
 function RequireAuth({ children }) {
     const [loggedIn, setLoggedIn] = useState();
@@ -89,7 +91,24 @@ const router = createBrowserRouter([
                 <Inserisci />
             </RequireAuth>
         ),
-
+    },
+    {
+        path: "inserisci_da_designazione",
+        element: (
+            <RequireAuth>
+                <Sidebar />
+                <InserisciDaDesignazione />
+            </RequireAuth>
+        ),
+    },
+    {
+        path: "inserisci_da_mail",
+        element: (
+            <RequireAuth>
+                <Sidebar />
+                <InserisciDaMail />
+            </RequireAuth>
+        ),
     },
 ]);
 export default router;

@@ -111,7 +111,7 @@ export default function TemporaryDrawer() {
                         </ListItemButton>
                     </List>
                     <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 5 }}>
+                        <ListItemButton sx={{ pl: 5 }} onClick={() => navigate("/inserisci_da_designazione")}>
                             <ListItemIcon>
                                 <ContentCopyIcon />
                             </ListItemIcon>
@@ -119,7 +119,7 @@ export default function TemporaryDrawer() {
                         </ListItemButton>
                     </List>
                     <List component="div" disablePadding>
-                        <ListItemButton sx={{ pl: 5 }}>
+                        <ListItemButton sx={{ pl: 5 }} onClick={() => navigate("/inserisci_da_mail")}>
                             <ListItemIcon>
                                 <MarkEmailReadIcon />
                             </ListItemIcon>
