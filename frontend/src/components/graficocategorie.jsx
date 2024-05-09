@@ -89,7 +89,7 @@ export default function GraficoCategorie() {
     const data = {
         datasets: [
             {
-                label: '# RIMBORSI',
+                label: '# NUMERO DI PARTITE PER CATEGORIA',
                 data: rows,
                 borderColor: 'rgb(255, 99, 132)',
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',

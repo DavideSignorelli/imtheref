@@ -16,11 +16,9 @@ import { visuallyHidden } from '@mui/utils';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
-import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { alpha } from '@mui/material/styles';
 import { Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 
 async function getDati() {
     if (window.location.pathname === "/home") {
@@ -31,7 +29,16 @@ async function getDati() {
     }
 }
 
+function getComparator(order, orderBy) {
+    return order === 'desc'
+        ? (a, b) => descendingComparator(a, b, orderBy)
+        : (a, b) => ascendingComparator(a, b, orderBy);
+}
+
 function descendingComparator(a, b, orderBy) {
+    if (orderBy === 'categoria') {
+        return b[orderBy].nome.localeCompare(a[orderBy].nome);
+    }
     if (b[orderBy] < a[orderBy]) {
         return -1;
     }
@@ -41,11 +48,19 @@ function descendingComparator(a, b, orderBy) {
     return 0;
 }
 
-function getComparator(order, orderBy) {
-    return order === 'desc'
-        ? (a, b) => descendingComparator(a, b, orderBy)
-        : (a, b) => -descendingComparator(a, b, orderBy);
+function ascendingComparator(a, b, orderBy) {
+    if (orderBy === 'categoria') {
+        return a[orderBy].nome.localeCompare(b[orderBy].nome);
+    }
+    if (a[orderBy] < b[orderBy]) {
+        return -1;
+    }
+    if (a[orderBy] > b[orderBy]) {
+        return 1;
+    }
+    return 0;
 }
+
 
 function stableSort(array, comparator) {
     const stabilizedThis = array.map((el, index) => [el, index]);
@@ -74,7 +89,7 @@ const headCells = [
     },
     {
         id: 'categoria',
-        numeric: true,
+        numeric: false,
         disablePadding: false,
         label: 'Categoria',
     },
@@ -139,7 +154,9 @@ function EnhancedTableHead(props) {
                 {headCells.map((headCell) => (
                     <TableCell
                         key={headCell.id}
-                        align={headCell.numeric ? 'right' : 'left'}
+                        align={
+                            headCell.id == "gara" || headCell.id == "rimborso" ? headCell.id == "gara" ? "left" : "right" : 'center'
+                        }
                         padding={headCell.disablePadding ? 'none' : 'normal'}
                         sortDirection={orderBy === headCell.id ? order : false}
                     >
@@ -229,7 +246,6 @@ export default function Tabella() {
         });
     }, []);
 
-
     const [order, setOrder] = React.useState('asc');
     const [orderBy, setOrderBy] = React.useState('data');
     const [selected, setSelected] = React.useState([]);
@@ -299,6 +315,7 @@ export default function Tabella() {
 
 
 
+
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
@@ -348,6 +365,7 @@ export default function Tabella() {
                                                 id={labelId}
                                                 scope="row"
                                                 padding="none"
+                                                align='left'
                                             >
                                                 {row.gara}
                                             </TableCell>
@@ -357,8 +375,8 @@ export default function Tabella() {
                                                 .replace(':00.000', '')
                                                 .replace('-', '/')
                                                 .replace('-', '/')}</TableCell>
-                                            <TableCell align="right">{row.categoria.nome}</TableCell>
-                                            <TableCell align="right">{row.voto}</TableCell>
+                                            <TableCell align="center">{row.categoria.nome}</TableCell>
+                                            <TableCell align="center">{row.voto}</TableCell>
                                             <TableCell align="right">{row.rimborso}</TableCell>
                                         </TableRow>
                                     );
