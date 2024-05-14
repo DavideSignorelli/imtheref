@@ -17,6 +17,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ModeIcon from '@mui/icons-material/Mode';
 import { alpha } from '@mui/material/styles';
 import { Button } from '@mui/material';
 
@@ -105,6 +106,12 @@ const headCells = [
         disablePadding: false,
         label: 'Rimborso',
     },
+    {
+        id: 'incasso',
+        numeric: true,
+        disablePadding: false,
+        label: 'Incasso',
+    },
 ];
 
 async function eliminaPartita(id) {
@@ -113,6 +120,25 @@ async function eliminaPartita(id) {
         credentials: "include"
     });
     return response.status;
+}
+
+async function modificaIncasso(event, id) {
+    const response = await fetch(`/api/partita/modificaIncasso/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+            incasso: event.target.checked,
+            partita: id
+        })
+    });
+    if (response.status != 200) {
+        alert('Errore, riprova più tardi');
+        return;
+    }
+    window.location.reload();
 }
 
 async function elimina(ids) {
@@ -223,6 +249,12 @@ function EnhancedTableToolbar(props) {
                 </Typography>
             )}
 
+            {numSelected == 1 && (
+                <Tooltip title="Modifica">
+                    <Button><ModeIcon /></Button>
+                </Tooltip>
+            )}
+
             {numSelected > 0 && (
                 <Tooltip title="Delete">
                     <Button onClick={() => elimina(selected)}><DeleteIcon /></Button>
@@ -269,6 +301,9 @@ export default function Tabella() {
     };
 
     const handleClick = (event, id) => {
+        if (event.target.type === 'checkbox') {
+            return;
+        }
         const selectedIndex = selected.indexOf(id);
         let newSelected = [];
 
@@ -378,6 +413,15 @@ export default function Tabella() {
                                             <TableCell align="center">{row.categoria.nome}</TableCell>
                                             <TableCell align="center">{row.voto}</TableCell>
                                             <TableCell align="right">{row.rimborso}</TableCell>
+                                            <TableCell align="center">
+                                                <Checkbox
+                                                    checked={row.incasso}
+                                                    onClick={(event) => {
+                                                        modificaIncasso(event, row.id);
+                                                    }}
+                                                    id={"ch" + row.id}
+                                                />
+                                            </TableCell>
                                         </TableRow>
                                     );
                                 })

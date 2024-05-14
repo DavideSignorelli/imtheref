@@ -73,6 +73,22 @@ async function ottieniPartitaDaTesto(testo) {
     return dati;
 }
 
+async function modificaIncasso(partita, incasso) {
+    try {
+        const partitaModificata = await prisma.partita.update({
+            where: { id: partita },
+            data: {
+                incasso: incasso
+            }
+        });
+        return partitaModificata;
+    }
+    catch (error) {
+        console.log(error);
+        return error;
+    }
+}
+
 async function creaPartita(req, dati) {
     try {
         const { gara, data, categoria, rimborso, incasso, voto } = dati;
@@ -115,5 +131,6 @@ async function creaPartita(req, dati) {
 
 module.exports = {
     ottieniPartitaDaTesto,
-    creaPartita
+    creaPartita,
+    modificaIncasso
 };

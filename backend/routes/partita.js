@@ -1,7 +1,7 @@
 const express = require('express');
 const partitaRouter = express.Router();
 const isLoggedIn = require('../utils/passport');
-const { ottieniPartitaDaTesto, creaPartita } = require('../utils/partita');
+const { ottieniPartitaDaTesto, creaPartita, modificaIncasso } = require('../utils/partita');
 const { PrismaClient, Prisma } = require('@prisma/client');
 //const { partita } = require('../utils/db');
 
@@ -108,6 +108,31 @@ partitaRouter.get('/visualizza/:id', isLoggedIn, async (req, res) => {
         return res.status(500).json({ error: 'Errore interno' + error });
     }
 });
+
+partitaRouter.put('/modificaIncasso/:id', isLoggedIn, async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        if (ObjectId.isValid(id) === false)
+            return res.status(400).json({ error: 'Id non valido' });
+        let gara = await prisma.partita.findMany({
+            where: {
+                id,
+                userId: req.session.passport.user
+            }
+        });
+        if (gara.length === 0) {
+            return res.status(404).json({ error: 'Partita non trovata' });
+        }
+        const partitaModificata = await modificaIncasso(id, req.body.incasso);
+        res.json(partitaModificata);
+    }
+    catch (error) {
+        return res.status(500).json({ error: 'Errore interno' + error });
+    }
+});
+
+
 
 partitaRouter.put('/modifica/:id', isLoggedIn, async (req, res) => {
     try {
