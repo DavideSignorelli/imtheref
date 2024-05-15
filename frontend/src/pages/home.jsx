@@ -1,4 +1,5 @@
 import Tabella from "../components/tabella";
+import GraficoFinanziario from "../components/graficofinanziario";
 import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
 import { useState, useEffect } from 'react';
@@ -65,6 +66,7 @@ function home() {
                 <Typography level="h4" component="h4" textAlign={"left"}>
                     Rimborsi da incassare: {daIncassare}€
                 </Typography>
+                <GraficoFinanziario />
             </Sheet>
         </div>
     );

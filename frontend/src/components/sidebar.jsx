@@ -74,7 +74,7 @@ export default function TemporaryDrawer() {
                             <ListItemIcon>
                                 <ThumbsUpDownIcon />
                             </ListItemIcon>
-                            <ListItemText primary="Voti" />
+                            <ListItemText primary="Valutazioni" />
                         </ListItemButton>
                     </List>
                     <List component="div" disablePadding>
