@@ -20,6 +20,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ModeIcon from '@mui/icons-material/Mode';
 import { alpha } from '@mui/material/styles';
 import { Button } from '@mui/material';
+import Modal from '@mui/material/Modal';
+import '../styles/loader.css';
 
 async function getDati() {
     if (window.location.pathname === "/home") {
@@ -122,24 +124,7 @@ async function eliminaPartita(id) {
     return response.status;
 }
 
-async function modificaIncasso(event, id) {
-    const response = await fetch(`/api/partita/modificaIncasso/${id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-            incasso: event.target.checked,
-            partita: id
-        })
-    });
-    if (response.status != 200) {
-        alert('Errore, riprova più tardi');
-        return;
-    }
-    window.location.reload();
-}
+
 
 async function elimina(ids) {
     for (let id of ids) {
@@ -269,6 +254,7 @@ export default function Tabella() {
     const [rows, setRows] = useState([]);
     const [dataLoaded, setDataLoaded] = useState(false);
     const [ids, setIds] = useState([]);
+    const [open, setOpen] = useState(false);
 
 
     React.useEffect(() => {
@@ -290,6 +276,31 @@ export default function Tabella() {
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
     };
+
+    async function modificaIncasso(event, id) {
+        setOpen(true);
+        const response = await fetch(`/api/partita/modificaIncasso/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                incasso: event.target.checked,
+                partita: id
+            })
+        });
+        if (response.status != 200) {
+            alert('Errore, riprova più tardi');
+            return;
+        }
+        getDati().then((data) => {
+            setRows(data);
+            setDataLoaded(true);
+        });
+        setOpen(false);
+        //window.location.reload();
+    }
 
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
@@ -347,12 +358,31 @@ export default function Tabella() {
         [rows, order, orderBy, page, rowsPerPage],
     );
 
+    const style = {
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        boxShadow: 24,
+        p: 4,
+    };
 
 
 
 
     return (
+
         <Box sx={{ width: '100%' }}>
+            <Modal
+                open={open}
+                onClose={() => setOpen(false)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <div className='loader' />
+                </Box>
+            </Modal>
             <Paper sx={{ width: '100%', mb: 2 }}>
                 <EnhancedTableToolbar selected={selected} />
                 <TableContainer>
@@ -417,7 +447,7 @@ export default function Tabella() {
                                                 <Checkbox
                                                     checked={row.incasso}
                                                     onClick={(event) => {
-                                                        modificaIncasso(event, row.id);
+                                                        modificaIncasso(event, row.id)
                                                     }}
                                                     id={"ch" + row.id}
                                                 />

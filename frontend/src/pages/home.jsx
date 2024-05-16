@@ -20,9 +20,11 @@ function home() {
     const [daIncassare, setDaIncassare] = useState(0);
 
     useEffect(() => {
-        getDati().then((dati) => {
-            setDati(dati);
-        });
+        setInterval(() => {
+            getDati().then((dati) => {
+                setDati(dati);
+            });
+        }, 1000);
     }, []);
 
     useEffect(() => {

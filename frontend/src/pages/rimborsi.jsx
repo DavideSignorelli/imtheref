@@ -19,7 +19,7 @@ export default function Rimborsi() {
             }}
         >
             <Typography level="h1" component="h1" textAlign={"center"}>
-                RIMBORSI
+                RIMBORSI cazzi tuoi
             </Typography>
             <GraficoRimborsi />
         </Sheet>
