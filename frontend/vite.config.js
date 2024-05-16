@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-
+//scp -r ./dist/* root@85.235.142.225:/var/www/imtheref/
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
