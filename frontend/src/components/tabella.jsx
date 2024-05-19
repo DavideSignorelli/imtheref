@@ -469,7 +469,7 @@ export default function Tabella() {
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[5, 10, 25, rows.length != 5 && rows.length != 10 && rows.length != 25 ? rows.length : null]}
                     component="div"
                     count={rows.length}
                     rowsPerPage={rowsPerPage}
